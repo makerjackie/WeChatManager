@@ -4,16 +4,25 @@ actor WeChatCloneService {
     static let bundleIdentifierPrefix = "com.makerjackie.WeChatManager.clone."
 
     private let homeDirectory: URL
+    private let managedApplicationsDirectory: URL
+    private let trashDirectory: URL?
     private let fileManager: FileManager
     private let commandRunner: CommandRunner
     private let plistEditor = WeChatClonePlistEditor()
 
     init(
         homeDirectory: URL = .homeDirectory,
+        managedApplicationsDirectory: URL = URL(
+            fileURLWithPath: "/Applications",
+            isDirectory: true
+        ),
+        trashDirectory: URL? = nil,
         fileManager: FileManager = .default,
         commandRunner: CommandRunner = CommandRunner()
     ) {
         self.homeDirectory = homeDirectory
+        self.managedApplicationsDirectory = managedApplicationsDirectory
+        self.trashDirectory = trashDirectory
         self.fileManager = fileManager
         self.commandRunner = commandRunner
     }
@@ -28,12 +37,12 @@ actor WeChatCloneService {
     func createNext(from installation: WeChatInstallation) async throws -> WeChatClone {
         let usedIndices = Set(clones().map(\.index))
         let index = (1...).first { !usedIndices.contains($0) } ?? 1
-        return try await create(index: index, from: installation, replacingExisting: false)
+        return try await create(index: index, from: installation, replacing: nil)
     }
 
     func update(_ clone: WeChatClone, from installation: WeChatInstallation) async throws -> WeChatClone {
         try validateManagedClone(clone)
-        return try await create(index: clone.index, from: installation, replacingExisting: true)
+        return try await create(index: clone.index, from: installation, replacing: clone)
     }
 
     func moveToTrash(_ clone: WeChatClone) throws -> URL {
@@ -53,13 +62,13 @@ actor WeChatCloneService {
     private func create(
         index: Int,
         from installation: WeChatInstallation,
-        replacingExisting: Bool
+        replacing existingClone: WeChatClone?
     ) async throws -> WeChatClone {
         guard index > 0, installation.isOfficiallySigned else {
             throw AppError(message: "只能从腾讯官方签名的微信创建分身。")
         }
 
-        let applicationsDirectory = homeDirectory.appending(path: "Applications")
+        let applicationsDirectory = managedApplicationsDirectory
         try fileManager.createDirectory(at: applicationsDirectory, withIntermediateDirectories: true)
         let destination = applicationsDirectory.appending(path: "微信分身 \(index).app")
         let temporary = applicationsDirectory.appending(
@@ -67,8 +76,13 @@ actor WeChatCloneService {
         )
         defer { try? fileManager.removeItem(at: temporary) }
 
-        if fileManager.fileExists(atPath: destination.path), !replacingExisting {
+        if fileManager.fileExists(atPath: destination.path), existingClone == nil {
             throw AppError(message: "微信分身 \(index) 已存在。")
+        }
+        if let existingClone,
+           existingClone.applicationURL.standardizedFileURL != destination.standardizedFileURL,
+           fileManager.fileExists(atPath: destination.path) {
+            throw AppError(message: "“应用程序”中已经存在微信分身 \(index)，请先处理重复分身。")
         }
 
         try fileManager.copyItem(at: installation.applicationURL, to: temporary)
@@ -85,19 +99,26 @@ actor WeChatCloneService {
         }
 
         var previousDestination: URL?
-        if fileManager.fileExists(atPath: destination.path) {
+        var previousOriginalURL: URL?
+        let previousApplicationURL = existingClone?.applicationURL ?? destination
+        if fileManager.fileExists(atPath: previousApplicationURL.path) {
             let trashRoot = try resolvedTrashDirectory()
-            let previous = uniqueDestination(in: trashRoot, name: destination.lastPathComponent)
-            try fileManager.moveItem(at: destination, to: previous)
+            let previous = uniqueDestination(
+                in: trashRoot,
+                name: previousApplicationURL.lastPathComponent
+            )
+            try fileManager.moveItem(at: previousApplicationURL, to: previous)
             previousDestination = previous
+            previousOriginalURL = previousApplicationURL
         }
 
         do {
             try fileManager.moveItem(at: temporary, to: destination)
         } catch {
             if let previousDestination,
-               !fileManager.fileExists(atPath: destination.path) {
-                try? fileManager.moveItem(at: previousDestination, to: destination)
+               let previousOriginalURL,
+               !fileManager.fileExists(atPath: previousOriginalURL.path) {
+                try? fileManager.moveItem(at: previousDestination, to: previousOriginalURL)
             }
             throw error
         }
@@ -168,21 +189,24 @@ actor WeChatCloneService {
     }
 
     private func candidateApplicationDirectories() -> [URL] {
-        [
-            homeDirectory.appending(path: "Applications"),
-            URL(fileURLWithPath: "/Applications", isDirectory: true)
-        ]
+        var seenPaths = Set<String>()
+        return [
+            managedApplicationsDirectory,
+            homeDirectory.appending(path: "Applications")
+        ].filter { seenPaths.insert($0.standardizedFileURL.path).inserted }
     }
 
     private func applications(in directory: URL) -> [URL] {
         guard let contents = try? fileManager.contentsOfDirectory(
             at: directory,
-            includingPropertiesForKeys: [.isApplicationKey],
+            includingPropertiesForKeys: nil,
             options: [.skipsHiddenFiles]
         ) else {
             return []
         }
-        return contents.filter { $0.pathExtension == "app" }
+        return contents.filter {
+            $0.pathExtension == "app" && $0.lastPathComponent.hasPrefix("微信分身 ")
+        }
     }
 
     private func clone(at applicationURL: URL) -> WeChatClone? {
@@ -220,6 +244,10 @@ actor WeChatCloneService {
     }
 
     private func resolvedTrashDirectory() throws -> URL {
+        if let trashDirectory {
+            try fileManager.createDirectory(at: trashDirectory, withIntermediateDirectories: true)
+            return trashDirectory
+        }
         guard let trash = fileManager.urls(for: .trashDirectory, in: .userDomainMask).first else {
             throw AppError(message: "找不到废纸篓。")
         }

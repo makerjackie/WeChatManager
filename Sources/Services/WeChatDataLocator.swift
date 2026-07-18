@@ -1,18 +1,21 @@
 import Foundation
 
-struct WeChatDataLocator {
+actor WeChatDataLocator {
     private let homeDirectory: URL
     private let fileManager: FileManager
+    private let commandRunner: CommandRunner
 
     init(
         homeDirectory: URL = .homeDirectory,
-        fileManager: FileManager = .default
+        fileManager: FileManager = .default,
+        commandRunner: CommandRunner = CommandRunner()
     ) {
         self.homeDirectory = homeDirectory
         self.fileManager = fileManager
+        self.commandRunner = commandRunner
     }
 
-    func locations() -> [StorageLocation] {
+    func locations() async -> [StorageLocation] {
         var locations: [StorageLocation] = []
         let containerRoot = homeDirectory.appending(
             path: "Library/Containers/com.tencent.xinWeChat/Data"
@@ -30,44 +33,49 @@ struct WeChatDataLocator {
             to: &locations
         )
 
-        accountDirectories(in: modernRoot).forEach { accountURL in
-            let accountName = accountURL.lastPathComponent
+        let accountURLs = await accountDirectories(in: modernRoot)
+        accountURLs.forEach { accountURL in
+            let accountIdentifier = accountURL.lastPathComponent
             appendIfPresent(
                 StorageLocation(
-                    title: accountName,
-                    detail: "账号数据目录",
+                    title: "账号数据",
+                    detail: "数据库、索引与账号配置",
                     url: accountURL,
                     category: .account,
+                    accountIdentifier: accountIdentifier,
                     allocatedSize: nil
                 ),
                 to: &locations
             )
             appendIfPresent(
                 StorageLocation(
-                    title: "收到的文件 · \(accountName)",
-                    detail: "聊天中接收的文档与压缩包",
+                    title: "收到的文件",
+                    detail: "聊天中接收的文档、表格与压缩包",
                     url: accountURL.appending(path: "msg/file"),
                     category: .files,
+                    accountIdentifier: accountIdentifier,
                     allocatedSize: nil
                 ),
                 to: &locations
             )
             appendIfPresent(
                 StorageLocation(
-                    title: "聊天视频 · \(accountName)",
-                    detail: "聊天中接收和发送的视频",
+                    title: "聊天视频",
+                    detail: "聊天中接收和发送的视频文件",
                     url: accountURL.appending(path: "msg/video"),
                     category: .videos,
+                    accountIdentifier: accountIdentifier,
                     allocatedSize: nil
                 ),
                 to: &locations
             )
             appendIfPresent(
                 StorageLocation(
-                    title: "账号缓存 · \(accountName)",
-                    detail: "可安全移入废纸篓的临时缓存",
+                    title: "临时缓存",
+                    detail: "可移入废纸篓的临时数据",
                     url: accountURL.appending(path: "cache"),
                     category: .cache,
+                    accountIdentifier: accountIdentifier,
                     allocatedSize: nil
                 ),
                 to: &locations
@@ -77,8 +85,8 @@ struct WeChatDataLocator {
         cacheCandidates(containerRoot: containerRoot).forEach { url in
             appendIfPresent(
                 StorageLocation(
-                    title: "微信缓存 · \(url.lastPathComponent)",
-                    detail: "应用运行产生的临时数据",
+                    title: "共享缓存",
+                    detail: "微信运行时产生的公共临时数据",
                     url: url,
                     category: .cache,
                     allocatedSize: nil
@@ -104,24 +112,32 @@ struct WeChatDataLocator {
         return deduplicated(locations)
     }
 
-    func allowedCacheRoots() -> [URL] {
-        locations().filter(\.isCache).map(\.url)
+    func allowedCacheRoots() async -> [URL] {
+        await locations().filter(\.isCache).map(\.url)
     }
 
-    private func accountDirectories(in root: URL) -> [URL] {
-        guard let children = try? fileManager.contentsOfDirectory(
-            at: root,
-            includingPropertiesForKeys: [.isDirectoryKey],
-            options: [.skipsHiddenFiles]
-        ) else {
+    private func accountDirectories(in root: URL) async -> [URL] {
+        guard let result = try? await commandRunner.run(
+            executableURL: URL(fileURLWithPath: "/bin/ls"),
+            arguments: ["-1A", root.path],
+            timeout: 3
+        ), result.terminationStatus == 0 else {
             return []
         }
 
-        return children.filter { url in
-            let values = try? url.resourceValues(forKeys: [.isDirectoryKey])
-            guard values?.isDirectory == true else { return false }
+        let names = result.standardOutput.split(whereSeparator: \.isNewline).map(String.init)
+        return names.compactMap { name -> URL? in
+            guard !name.hasPrefix(".") else { return nil }
+            let url = root.appending(path: name, directoryHint: .isDirectory)
+            var isDirectory: ObjCBool = false
+            guard fileManager.fileExists(atPath: url.path, isDirectory: &isDirectory),
+                  isDirectory.boolValue else {
+                return nil
+            }
             return fileManager.fileExists(atPath: url.appending(path: "msg").path)
                 || fileManager.fileExists(atPath: url.appending(path: "db_storage").path)
+                ? url
+                : nil
         }
         .sorted { $0.lastPathComponent.localizedStandardCompare($1.lastPathComponent) == .orderedAscending }
     }

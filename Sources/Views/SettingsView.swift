@@ -35,6 +35,13 @@ struct SettingsView: View {
                 Text("缓存清理只会把明确选择的缓存目录移入废纸篓，不会静默永久删除。")
                     .foregroundStyle(.secondary)
             }
+
+            Section("使用边界") {
+                Text("本应用只管理用户本人 Mac 上的微信应用和本地文件，不连接、扫描或控制腾讯服务器。")
+                    .foregroundStyle(.secondary)
+                Text("本项目与腾讯、微信没有关联。使用分身或兼容增强前，请自行了解微信软件许可协议及账号规则。")
+                    .foregroundStyle(.secondary)
+            }
         }
         .formStyle(.grouped)
         .navigationTitle("设置")

@@ -9,4 +9,7 @@ struct WeChatClone: Identifiable, Sendable, Equatable {
     let sourceBuild: String
 
     var id: String { bundleIdentifier }
+    var isInstalledInApplicationsFolder: Bool {
+        applicationURL.deletingLastPathComponent().standardizedFileURL.path == "/Applications"
+    }
 }

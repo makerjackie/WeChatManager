@@ -5,7 +5,7 @@ import Foundation
 struct WeChatLaunchService {
     private let workspace = NSWorkspace.shared
 
-    func installation() -> WeChatInstallation? {
+    func installation() async -> WeChatInstallation? {
         let locatedURL = workspace.urlForApplication(
             withBundleIdentifier: AppConstants.weChatBundleIdentifier
         )
@@ -20,7 +20,9 @@ struct WeChatLaunchService {
 
         let version = bundle.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "未知"
         let build = bundle.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "未知"
-        let teamIdentifier = CodeSignatureInspector().teamIdentifier(for: applicationURL)
+        let teamIdentifier = await Task.detached(priority: .userInitiated) {
+            CodeSignatureInspector().teamIdentifier(for: applicationURL)
+        }.value
         return WeChatInstallation(
             applicationURL: applicationURL,
             version: version,
@@ -34,7 +36,7 @@ struct WeChatLaunchService {
     }
 
     func launchOfficial() async throws {
-        guard let installation = installation() else {
+        guard let installation = await installation() else {
             throw AppError(message: "没有找到微信。请先将微信安装到“应用程序”文件夹。")
         }
 

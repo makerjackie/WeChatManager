@@ -17,7 +17,7 @@ final class WeChatDataLocatorTests: XCTestCase {
         }
     }
 
-    func testFindsModernAccountFilesVideosAndCache() throws {
+    func testFindsModernAccountFilesVideosAndCache() async throws {
         let accountRoot = temporaryHome.appending(
             path: "Library/Containers/com.tencent.xinWeChat/Data/Documents/xwechat_files/wxid_example"
         )
@@ -28,7 +28,7 @@ final class WeChatDataLocatorTests: XCTestCase {
             )
         }
 
-        let locations = WeChatDataLocator(homeDirectory: temporaryHome).locations()
+        let locations = await WeChatDataLocator(homeDirectory: temporaryHome).locations()
 
         XCTAssertTrue(locations.contains { $0.category == .root })
         XCTAssertTrue(locations.contains { $0.category == .account })
@@ -36,9 +36,14 @@ final class WeChatDataLocatorTests: XCTestCase {
         XCTAssertTrue(locations.contains { $0.category == .videos })
         XCTAssertTrue(locations.contains { $0.category == .cache })
         XCTAssertEqual(Set(locations.map(\.id)).count, locations.count)
+        let accountLocations = locations.filter { $0.accountIdentifier != nil }
+        XCTAssertTrue(accountLocations.allSatisfy { $0.accountIdentifier == "wxid_example" })
+        XCTAssertTrue(accountLocations.allSatisfy { !$0.title.contains("wxid_example") })
+        XCTAssertTrue(accountLocations.allSatisfy { !$0.detail.contains("wxid_example") })
     }
 
-    func testDoesNotInventMissingLocations() {
-        XCTAssertTrue(WeChatDataLocator(homeDirectory: temporaryHome).locations().isEmpty)
+    func testDoesNotInventMissingLocations() async {
+        let locations = await WeChatDataLocator(homeDirectory: temporaryHome).locations()
+        XCTAssertTrue(locations.isEmpty)
     }
 }

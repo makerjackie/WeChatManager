@@ -11,6 +11,7 @@ final class AppModel {
     var storageLocations: [StorageLocation] = []
     var clones: [WeChatClone] = []
     var storageSearchText = ""
+    var accountAliases: [String: String] = [:]
     var selectedCacheIDs = Set<String>()
     var isRefreshing = false
     var isCalculatingSizes = false
@@ -37,15 +38,49 @@ final class AppModel {
     @ObservationIgnored
     private let enhancementService = EnhancementService()
     @ObservationIgnored
+    private let accountNameStore: AccountNameStore
+    @ObservationIgnored
     private var sizeScanTask: Task<Void, Never>?
 
-    var filteredStorageLocations: [StorageLocation] {
-        guard !storageSearchText.isEmpty else { return storageLocations }
-        return storageLocations.filter { location in
-            location.title.localizedStandardContains(storageSearchText)
-                || location.detail.localizedStandardContains(storageSearchText)
-                || location.url.path.localizedStandardContains(storageSearchText)
+    init(accountNameStore: AccountNameStore = AccountNameStore()) {
+        self.accountNameStore = accountNameStore
+    }
+
+    var visibleStorageAccountGroups: [StorageAccountGroup] {
+        var seenIdentifiers = Set<String>()
+        let identifiers = storageLocations.compactMap(\.accountIdentifier).filter {
+            seenIdentifiers.insert($0).inserted
         }
+
+        return identifiers.enumerated().compactMap { offset, identifier in
+            let defaultName = StorageAccountGroup.defaultName(for: offset + 1)
+            let displayName = accountAliases[identifier] ?? defaultName
+            let locations = storageLocations.filter { $0.accountIdentifier == identifier }
+            let visibleLocations: [StorageLocation]
+            if storageSearchText.isEmpty
+                || displayName.localizedStandardContains(storageSearchText) {
+                visibleLocations = locations
+            } else {
+                visibleLocations = locations.filter(matchesStorageSearch)
+            }
+            guard !visibleLocations.isEmpty else { return nil }
+            return StorageAccountGroup(
+                id: identifier,
+                displayName: displayName,
+                defaultName: defaultName,
+                locations: visibleLocations
+            )
+        }
+    }
+
+    var visibleAdditionalStorageLocations: [StorageLocation] {
+        let locations = storageLocations.filter { $0.accountIdentifier == nil }
+        guard !storageSearchText.isEmpty else { return locations }
+        return locations.filter(matchesStorageSearch)
+    }
+
+    var hasVisibleStorageLocations: Bool {
+        !visibleStorageAccountGroups.isEmpty || !visibleAdditionalStorageLocations.isEmpty
     }
 
     var selectedCacheCount: Int {
@@ -86,7 +121,8 @@ final class AppModel {
                 if let availableClone = currentClones.first(where: {
                     !launchService.isRunning(bundleIdentifier: $0.bundleIdentifier)
                 }) {
-                    try await launchService.launch(applicationURL: availableClone.applicationURL)
+                    let preparedClone = try await preparedCloneForLaunch(availableClone)
+                    try await launchService.launch(applicationURL: preparedClone.applicationURL)
                 } else {
                     guard let installation else {
                         throw AppError(message: "请先安装官方微信。")
@@ -154,6 +190,21 @@ final class AppModel {
         message = UserMessage(title: "已复制路径", detail: location.url.path)
     }
 
+    func renameAccount(identifier: String, name: String) {
+        let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedName.isEmpty else {
+            message = UserMessage(title: "名称不能为空", detail: "请输入一个容易辨认的账号名称。")
+            return
+        }
+        accountAliases[identifier] = trimmedName
+        accountNameStore.setName(trimmedName, for: identifier)
+    }
+
+    func resetAccountName(identifier: String) {
+        accountAliases.removeValue(forKey: identifier)
+        accountNameStore.setName(nil, for: identifier)
+    }
+
     func requestEnhancementInstall() {
         showsInstallConfirmation = true
     }
@@ -200,7 +251,8 @@ final class AppModel {
     func launch(_ clone: WeChatClone) {
         Task {
             do {
-                try await launchService.launch(applicationURL: clone.applicationURL)
+                let preparedClone = try await preparedCloneForLaunch(clone)
+                try await launchService.launch(applicationURL: preparedClone.applicationURL)
                 try? await Task.sleep(for: .seconds(1))
                 runningInstanceCount = launchService.runningInstanceCount()
             } catch {
@@ -266,10 +318,12 @@ final class AppModel {
         isRefreshing = true
         defer { isRefreshing = false }
 
-        installation = launchService.installation()
+        installation = await launchService.installation()
         runningInstanceCount = launchService.runningInstanceCount()
         clones = await cloneService.clones()
-        storageLocations = dataLocator.locations()
+        storageLocations = await dataLocator.locations()
+        let accountIdentifiers = Array(Set(storageLocations.compactMap(\.accountIdentifier)))
+        accountAliases = accountNameStore.names(for: accountIdentifiers)
         selectedCacheIDs.formIntersection(Set(storageLocations.filter(\.isCache).map(\.id)))
 
         guard let installation else {
@@ -320,10 +374,11 @@ final class AppModel {
             .filter { selectedCacheIDs.contains($0.id) && $0.isCache }
             .map(\.url)
         do {
-            let cleaner = try CacheCleaner(allowedRoots: dataLocator.allowedCacheRoots())
+            let allowedCacheRoots = await dataLocator.allowedCacheRoots()
+            let cleaner = try CacheCleaner(allowedRoots: allowedCacheRoots)
             let result = try await cleaner.clean(urls: targets)
             selectedCacheIDs.removeAll()
-            storageLocations = dataLocator.locations()
+            storageLocations = await dataLocator.locations()
             message = UserMessage(
                 title: "缓存已移入废纸篓",
                 detail: "已处理 \(result.movedItemCount) 个目录，可从废纸篓恢复。"
@@ -375,5 +430,27 @@ final class AppModel {
 
     private func present(error: any Error, title: String) {
         message = UserMessage(title: title, detail: error.localizedDescription)
+    }
+
+    private func preparedCloneForLaunch(_ clone: WeChatClone) async throws -> WeChatClone {
+        guard !clone.isInstalledInApplicationsFolder else { return clone }
+        guard !launchService.isRunning(bundleIdentifier: clone.bundleIdentifier) else {
+            throw AppError(message: "请先退出旧版分身，再打开一次以完成位置迁移。")
+        }
+        guard let installation else {
+            throw AppError(message: "请先安装官方微信，才能迁移旧版分身。")
+        }
+        let migratedClone = try await cloneService.update(clone, from: installation)
+        message = UserMessage(
+            title: "分身已移到“应用程序”",
+            detail: "已修复微信的安装位置提示，账号登录数据保持不变。"
+        )
+        return migratedClone
+    }
+
+    private func matchesStorageSearch(_ location: StorageLocation) -> Bool {
+        location.title.localizedStandardContains(storageSearchText)
+            || location.detail.localizedStandardContains(storageSearchText)
+            || location.url.path.localizedStandardContains(storageSearchText)
     }
 }

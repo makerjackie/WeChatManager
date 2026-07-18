@@ -21,16 +21,14 @@ struct ManagedCloneRow: View {
                 }
                 Text("来源：微信 \(clone.sourceVersion)（\(clone.sourceBuild)）")
                     .foregroundStyle(.secondary)
-                Text(clone.applicationURL.path)
-                    .font(.callout.monospaced())
-                    .foregroundStyle(.tertiary)
-                    .textSelection(.enabled)
+                Text(clone.isInstalledInApplicationsFolder ? "位置：应用程序" : "旧版位置：下次启动时自动迁移")
+                    .foregroundStyle(locationColor)
             }
 
             Spacer()
 
             if needsUpdate {
-                Button("更新分身", systemImage: "arrow.triangle.2.circlepath", action: updateClone)
+                Button(updateButtonTitle, systemImage: "arrow.triangle.2.circlepath", action: updateClone)
             }
             Button("启动", systemImage: "play.fill", action: launchClone)
                 .buttonStyle(.borderedProminent)
@@ -59,7 +57,15 @@ struct ManagedCloneRow: View {
 
     private var needsUpdate: Bool {
         guard let installation = model.installation else { return false }
-        return clone.sourceBuild != installation.build
+        return !clone.isInstalledInApplicationsFolder || clone.sourceBuild != installation.build
+    }
+
+    private var updateButtonTitle: String {
+        clone.isInstalledInApplicationsFolder ? "更新分身" : "修复位置"
+    }
+
+    private var locationColor: Color {
+        clone.isInstalledInApplicationsFolder ? .secondary : .orange
     }
 
     private func launchClone() {

@@ -2,16 +2,38 @@ import SwiftUI
 
 struct FileManagerView: View {
     @Environment(AppModel.self) private var model
+    @State private var editingAccount: StorageAccountGroup?
 
     var body: some View {
         @Bindable var model = model
         VStack(spacing: 0) {
-            if model.filteredStorageLocations.isEmpty {
-                ContentUnavailableView.search(text: model.storageSearchText)
+            if !model.hasVisibleStorageLocations {
+                if model.storageSearchText.isEmpty {
+                    ContentUnavailableView(
+                        "暂未找到微信文件",
+                        systemImage: "folder.badge.questionmark",
+                        description: Text("登录微信并收发文件后，再回来刷新。")
+                    )
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else {
+                    ContentUnavailableView.search(text: model.storageSearchText)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                }
             } else {
-                List(model.filteredStorageLocations) { location in
-                    StorageLocationRow(location: location)
+                List {
+                    FileManagerIntroRow()
+
+                    ForEach(model.visibleStorageAccountGroups) { group in
+                        AccountStorageSection(group: group) {
+                            editingAccount = group
+                        }
+                    }
+
+                    if !model.visibleAdditionalStorageLocations.isEmpty {
+                        AdditionalStorageSection(
+                            locations: model.visibleAdditionalStorageLocations
+                        )
+                    }
                 }
                 .scrollContentBackground(.visible)
             }
@@ -39,6 +61,17 @@ struct FileManagerView: View {
             Button("取消", role: .cancel) { }
         } message: {
             Text("不会删除聊天记录、收到的文件或视频。关闭微信后执行，缓存仍可从废纸篓恢复。")
+        }
+        .sheet(item: $editingAccount) { group in
+            AccountRenameSheet(
+                group: group,
+                onSave: { name in
+                    model.renameAccount(identifier: group.id, name: name)
+                },
+                onReset: {
+                    model.resetAccountName(identifier: group.id)
+                }
+            )
         }
     }
 }

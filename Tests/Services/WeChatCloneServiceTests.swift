@@ -50,7 +50,10 @@ final class WeChatCloneServiceTests: XCTestCase {
             build: "269110",
             teamIdentifier: AppConstants.officialWeChatTeamIdentifier
         )
-        let service = WeChatCloneService(homeDirectory: home)
+        let service = WeChatCloneService(
+            homeDirectory: home,
+            managedApplicationsDirectory: home.appending(path: "Applications")
+        )
 
         let clone = try await service.createNext(from: installation)
         let discovered = await service.clones()
@@ -72,6 +75,47 @@ final class WeChatCloneServiceTests: XCTestCase {
             format: nil
         ) as? [String: Any]
         XCTAssertNil(plist?["CFBundleURLTypes"])
+    }
+
+    func testUpdatingLegacyCloneMovesItIntoManagedApplicationsDirectory() async throws {
+        let root = FileManager.default.temporaryDirectory.appending(
+            path: "WeChatCloneMigrationTests-\(UUID().uuidString)"
+        )
+        defer { try? FileManager.default.removeItem(at: root) }
+        let home = root.appending(path: "home")
+        let legacyApplications = home.appending(path: "Applications")
+        let managedApplications = root.appending(path: "Applications")
+        let trash = root.appending(path: "Trash")
+        let source = root.appending(path: "WeChat.app")
+        try FileManager.default.createDirectory(at: home, withIntermediateDirectories: true)
+        try writeRunnableApplication(at: source)
+        let installation = WeChatInstallation(
+            applicationURL: source,
+            version: "4.1.11",
+            build: "269110",
+            teamIdentifier: AppConstants.officialWeChatTeamIdentifier
+        )
+        let legacyService = WeChatCloneService(
+            homeDirectory: home,
+            managedApplicationsDirectory: legacyApplications,
+            trashDirectory: trash
+        )
+        let legacyClone = try await legacyService.createNext(from: installation)
+        let migrationService = WeChatCloneService(
+            homeDirectory: home,
+            managedApplicationsDirectory: managedApplications,
+            trashDirectory: trash
+        )
+
+        let migratedClone = try await migrationService.update(legacyClone, from: installation)
+
+        XCTAssertEqual(
+            migratedClone.applicationURL.deletingLastPathComponent().standardizedFileURL,
+            managedApplications.standardizedFileURL
+        )
+        XCTAssertFalse(FileManager.default.fileExists(atPath: legacyClone.applicationURL.path))
+        XCTAssertTrue(FileManager.default.fileExists(atPath: migratedClone.applicationURL.path))
+        XCTAssertEqual(try FileManager.default.contentsOfDirectory(atPath: trash.path).count, 1)
     }
 
     private func writeApplication(at applicationURL: URL, plist: [String: Any]) throws {
