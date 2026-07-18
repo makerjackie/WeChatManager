@@ -8,7 +8,7 @@ jobs:
   test:
     runs-on: macos-15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: 安装 XcodeGen
         run: brew install xcodegen
       - name: 生成工程
