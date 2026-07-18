@@ -501,7 +501,7 @@ final class AppModel {
         applyStorageLocations(await dataLocator.locations())
 
         guard let installation else {
-            compatibility = .unavailable(reason: "没有找到微信，兼容增强不可用。")
+            compatibility = .unavailable(reason: "没有找到微信。", supportedBuilds: [])
             hasEnhancementBackup = false
             return
         }

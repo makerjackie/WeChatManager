@@ -26,17 +26,26 @@ actor EnhancementService {
     func compatibility(build: String) async -> EnhancementCompatibility {
         do {
             let configurations = try await configurationService.configurations()
+            let supportedBuilds = configurations
+                .filter { !$0.enhancementOptions(for: .current).isEmpty }
+                .map(\.version)
+                .sorted { (Int($0) ?? 0) < (Int($1) ?? 0) }
             guard let configuration = configurations.first(where: { $0.version == build }) else {
-                return .unavailable(reason: "当前微信构建号 \(build) 暂无增强配置；多开启动和文件管理仍可正常使用。")
+                return .unavailable(
+                    reason: "当前微信暂不支持功能增强。",
+                    supportedBuilds: supportedBuilds
+                )
             }
-            let identifiers = Set(configuration.targets.map(\.identifier))
-            let options = Set(EnhancementOption.allCases.filter { identifiers.contains($0.rawValue) })
+            let options = configuration.enhancementOptions(for: .current)
             guard !options.isEmpty else {
-                return .unavailable(reason: "当前版本的上游配置没有可用增强项。")
+                return .unavailable(
+                    reason: "当前微信版本不支持这台 Mac 的处理器。",
+                    supportedBuilds: supportedBuilds
+                )
             }
-            return .compatible(options: options)
+            return .compatible(options: options, supportedBuilds: supportedBuilds)
         } catch {
-            return .unavailable(reason: error.localizedDescription)
+            return .unavailable(reason: error.localizedDescription, supportedBuilds: [])
         }
     }
 

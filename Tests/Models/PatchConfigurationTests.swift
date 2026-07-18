@@ -43,4 +43,19 @@ final class PatchConfigurationTests: XCTestCase {
             try JSONDecoder().decode([PatchConfiguration].self, from: Data(json.utf8))
         )
     }
+
+    func testFiltersEnhancementsByProcessorArchitecture() throws {
+        let json = """
+        [{"version":"1","targets":[
+          {"identifier":"multiInstance","entries":[{"arch":"arm64","addr":"1000","asm":"00"}]},
+          {"identifier":"revoke","entries":[{"arch":"x86_64","addr":"1000","asm":"00"}]}
+        ]}]
+        """
+        let configuration = try XCTUnwrap(
+            JSONDecoder().decode([PatchConfiguration].self, from: Data(json.utf8)).first
+        )
+
+        XCTAssertEqual(configuration.enhancementOptions(for: .arm64), [.multiInstance])
+        XCTAssertEqual(configuration.enhancementOptions(for: .x86_64), [.preventRevoke])
+    }
 }

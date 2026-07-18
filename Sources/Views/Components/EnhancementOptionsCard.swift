@@ -8,7 +8,7 @@ struct EnhancementOptionsCard: View {
             Text("选择功能")
                 .font(.headline)
 
-            if case let .compatible(availableOptions) = model.compatibility {
+            if case let .compatible(availableOptions, _) = model.compatibility {
                 ForEach(EnhancementOption.allCases.filter { availableOptions.contains($0) }) { option in
                     EnhancementOptionRow(option: option)
                     if option != EnhancementOption.allCases.last {

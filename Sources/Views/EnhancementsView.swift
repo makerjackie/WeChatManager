@@ -12,13 +12,23 @@ struct EnhancementsView: View {
                     infoTitle: "使用前须知",
                     infoDetails: [
                         "仅支持已适配的微信版本",
+                        "目前仅支持 Apple 芯片 Mac",
                         "安装前会自动备份微信",
                         "普通多开和文件管理不受影响"
                     ]
                 )
 
                 CompatibilityCard()
-                EnhancementOptionsCard()
+                switch model.compatibility {
+                case .compatible:
+                    EnhancementOptionsCard()
+                case let .unavailable(_, supportedBuilds):
+                    if supportedBuilds.contains(CompatibleWeChatRelease.recommended.build) {
+                        CompatibleVersionGuideCard(supportedBuilds: supportedBuilds)
+                    }
+                case .checking:
+                    EmptyView()
+                }
             }
             .padding(DesignTokens.contentPadding)
             .frame(maxWidth: 860, alignment: .leading)
