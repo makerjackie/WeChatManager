@@ -41,13 +41,13 @@ struct FileManagerView: View {
             CacheCleanupBar()
         }
         .navigationTitle("文件管理")
-        .searchable(text: $model.storageSearchText, prompt: "搜索目录或路径")
+        .searchable(text: $model.storageSearchText, prompt: "搜索微信文件")
         .toolbar {
             ToolbarItemGroup(placement: .primaryAction) {
                 if model.isCalculatingSizes {
                     Button("停止计算", systemImage: "stop.circle", action: model.cancelStorageScan)
                 } else {
-                    Button("计算占用", systemImage: "chart.pie", action: model.calculateStorageSizes)
+                    Button("计算空间", systemImage: "chart.pie", action: model.calculateStorageSizes)
                 }
                 Button("刷新", systemImage: "arrow.clockwise", action: model.refresh)
             }
@@ -59,8 +59,6 @@ struct FileManagerView: View {
         ) {
             Button("移入废纸篓", role: .destructive, action: model.cleanSelectedCaches)
             Button("取消", role: .cancel) { }
-        } message: {
-            Text("只清理缓存，可从废纸篓恢复。")
         }
         .sheet(item: $editingAccount) { group in
             AccountRenameSheet(

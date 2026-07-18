@@ -14,12 +14,15 @@ struct SaveClonePlanSheet: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: DesignTokens.roomySpacing) {
-            VStack(alignment: .leading, spacing: DesignTokens.compactSpacing) {
+            HStack(alignment: .firstTextBaseline) {
                 Text("保存当前方案")
                     .font(.title2)
                     .bold()
-                Text("保存分身数量和名称。")
-                    .foregroundStyle(.secondary)
+                InfoButton(
+                    title: "方案说明",
+                    details: ["保存分身数量和名称", "不会上传聊天或登录信息"]
+                )
+                Spacer()
             }
 
             TextField("方案名称", text: $name)

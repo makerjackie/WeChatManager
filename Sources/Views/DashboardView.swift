@@ -6,14 +6,15 @@ struct DashboardView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: DesignTokens.roomySpacing) {
-                VStack(alignment: .leading, spacing: DesignTokens.compactSpacing) {
-                    Text("微信多开助手")
-                        .font(.largeTitle)
-                        .bold()
-                    Text("多开、文件和更新，都在这里。")
-                        .font(.title3)
-                        .foregroundStyle(.secondary)
-                }
+                PageHeader(
+                    title: "微信多开助手",
+                    infoTitle: "可以做什么",
+                    infoDetails: [
+                        "同时登录多个微信账号",
+                        "快速找到微信文件",
+                        "统一更新和恢复分身"
+                    ]
+                )
 
                 WeChatStatusCard()
                 CloneUpdateNotice()

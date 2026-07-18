@@ -6,14 +6,15 @@ struct InstancesView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: DesignTokens.roomySpacing) {
-                VStack(alignment: .leading, spacing: DesignTokens.compactSpacing) {
-                    Text("分身管理")
-                        .font(.largeTitle)
-                        .bold()
-                    Text("每个分身可登录一个微信账号。")
-                        .font(.title3)
-                        .foregroundStyle(.secondary)
-                }
+                PageHeader(
+                    title: "微信分身",
+                    infoTitle: "关于微信分身",
+                    infoDetails: [
+                        "每个分身可登录一个微信账号",
+                        "分身之间互不影响",
+                        "更新或移除分身不会删除聊天数据"
+                    ]
+                )
 
                 if let installation = model.installation {
                     OfficialInstanceCard(installation: installation)
@@ -33,8 +34,6 @@ struct InstancesView: View {
                         }
                     }
                 }
-
-                ClonePrivacyCard()
             }
             .padding(DesignTokens.contentPadding)
             .frame(maxWidth: 860, alignment: .leading)

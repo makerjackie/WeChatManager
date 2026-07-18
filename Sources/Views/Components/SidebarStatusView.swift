@@ -12,7 +12,7 @@ struct SidebarStatusView: View {
             .foregroundStyle(model.installation == nil ? .orange : .green)
             .accessibilityLabel(model.installation == nil ? "未找到微信" : "微信已就绪")
 
-            Text("正在运行 \(model.runningInstanceCount) 个实例")
+            Text("已打开 \(model.runningInstanceCount) 个微信")
                 .foregroundStyle(.secondary)
         }
         .font(.callout)

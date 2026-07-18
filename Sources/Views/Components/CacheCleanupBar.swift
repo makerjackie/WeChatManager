@@ -10,10 +10,10 @@ struct CacheCleanupBar: View {
                 if model.isCalculatingSizes {
                     ProgressView(value: model.sizeScanProgress)
                         .frame(maxWidth: 220)
-                    Text("正在计算目录占用…")
+                    Text("正在计算空间…")
                         .foregroundStyle(.secondary)
                 } else {
-                    Text("已选择 \(model.selectedCacheCount) 个缓存目录")
+                    Text("已选择 \(model.selectedCacheCount) 项")
                         .foregroundStyle(.secondary)
                 }
                 Spacer()

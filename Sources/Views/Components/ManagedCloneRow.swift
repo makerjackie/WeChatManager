@@ -19,8 +19,6 @@ struct ManagedCloneRow: View {
                     Text(model.isRunning(clone) ? "运行中" : "未运行")
                         .foregroundStyle(model.isRunning(clone) ? .green : .secondary)
                 }
-                Text("微信 \(clone.sourceVersion)")
-                    .foregroundStyle(.secondary)
                 if !clone.isInstalledInApplicationsFolder {
                     Label("需要修复位置", systemImage: "exclamationmark.triangle.fill")
                         .foregroundStyle(.orange)
@@ -28,6 +26,15 @@ struct ManagedCloneRow: View {
             }
 
             Spacer()
+
+            InfoButton(
+                title: clone.displayName,
+                details: [
+                    "微信版本：\(clone.sourceVersion)",
+                    "可独立登录一个微信账号",
+                    "移除分身不会删除聊天数据"
+                ]
+            )
 
             if needsUpdate {
                 Button(updateButtonTitle, systemImage: "arrow.triangle.2.circlepath", action: updateClone)
@@ -52,8 +59,6 @@ struct ManagedCloneRow: View {
         ) {
             Button("移入废纸篓", role: .destructive, action: deleteClone)
             Button("取消", role: .cancel) { }
-        } message: {
-            Text("分身会移入废纸篓，聊天数据会保留。")
         }
     }
 

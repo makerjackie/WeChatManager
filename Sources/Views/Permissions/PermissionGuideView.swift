@@ -10,22 +10,28 @@ struct PermissionGuideView: View {
     var body: some View {
         VStack(spacing: 0) {
             HStack {
-                VStack(alignment: .leading, spacing: DesignTokens.compactSpacing) {
-                    Text("权限引导")
-                        .font(.title2)
-                        .bold()
-                    Text("需要时再由 macOS 请求。")
-                        .foregroundStyle(.secondary)
-                }
+                Text("设置权限")
+                    .font(.title2)
+                    .bold()
+                InfoButton(
+                    title: "为什么需要权限",
+                    details: [
+                        "识别微信并创建分身",
+                        "帮你找到微信文件",
+                        "权限可随时在系统设置中更改"
+                    ]
+                )
                 Spacer()
                 Button("稍后处理", action: model.deferPermissionGuide)
                     .disabled(isRequesting)
             }
             .padding(DesignTokens.contentPadding)
 
-            PermissionGuideProgressView(selectedStep: step)
-                .padding(.horizontal, DesignTokens.contentPadding)
-                .padding(.bottom, DesignTokens.roomySpacing)
+            if step != .introduction {
+                PermissionGuideProgressView(selectedStep: step)
+                    .padding(.horizontal, DesignTokens.contentPadding)
+                    .padding(.bottom, DesignTokens.roomySpacing)
+            }
 
             Divider()
 
@@ -37,46 +43,42 @@ struct PermissionGuideView: View {
                     )
                 case .applicationAccess:
                     PermissionGuideAccessView(
-                        title: "读取微信应用",
-                        subtitle: "用于识别当前微信并创建分身。",
-                        systemPrompt: "macOS 会询问是否允许访问微信。",
-                        reasons: [
-                            "读取版本信息",
-                            "创建和更新分身",
-                            "不会修改原微信"
+                        title: "允许访问微信",
+                        systemImage: "app.badge.checkmark",
+                        infoTitle: "用于创建分身",
+                        infoDetails: [
+                            "只读取微信应用信息",
+                            "不会在这一步修改微信"
                         ],
                         result: applicationResult,
                         isRequesting: isRequesting,
-                        requestAction: requestApplicationAccess,
                         backAction: showIntroduction,
-                        continueAction: showFileAccess
+                        nextAction: requestApplicationAccess
                     )
                 case .fileAccess:
                     PermissionGuideAccessView(
-                        title: "读取微信文件",
-                        subtitle: "用于按账号整理文件。",
-                        systemPrompt: "macOS 会询问是否允许访问微信数据。",
-                        reasons: [
-                            "查找文件并计算占用",
-                            "不读取或上传聊天内容"
+                        title: "允许访问微信文件",
+                        systemImage: "folder.badge.gearshape",
+                        infoTitle: "用于文件管理",
+                        infoDetails: [
+                            "帮你找到文件和视频",
+                            "不会读取或上传聊天内容"
                         ],
                         result: fileResult,
                         isRequesting: isRequesting,
-                        requestAction: requestFileAccess,
                         backAction: showApplicationAccess,
-                        continueAction: showAppManagement
+                        nextAction: requestFileAccess
                     )
                 case .appManagement:
                     PermissionGuideAppManagementView(
                         backAction: showFileAccess,
-                        openSettingsAction: model.openAppManagementSettings,
                         completeAction: model.completePermissionGuide
                     )
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
-        .frame(minWidth: 680, idealWidth: 740, minHeight: 520)
+        .frame(minWidth: 620, idealWidth: 680, minHeight: 460)
         .interactiveDismissDisabled()
     }
 
@@ -86,6 +88,9 @@ struct PermissionGuideView: View {
         Task {
             applicationResult = await model.requestWeChatApplicationAccess()
             isRequesting = false
+            if applicationResult?.canContinue == true {
+                showFileAccess()
+            }
         }
     }
 
@@ -95,6 +100,9 @@ struct PermissionGuideView: View {
         Task {
             fileResult = await model.requestWeChatDataAccess()
             isRequesting = false
+            if fileResult?.canContinue == true {
+                showAppManagement()
+            }
         }
     }
 

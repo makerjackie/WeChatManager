@@ -6,47 +6,50 @@ struct CloneUpdateCard: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: DesignTokens.standardSpacing) {
-            Label("分身更新", systemImage: statusImage)
-                .font(.title2)
-                .bold()
+            HStack {
+                Label(statusTitle, systemImage: statusImage)
+                    .font(.title2)
+                    .bold()
+                Spacer()
+                InfoButton(title: "更新说明", details: updateDetails)
+            }
 
-            if let installation = model.installation {
-                if model.clones.isEmpty {
-                    Text("微信 \(installation.version) 已就绪。")
-                        .foregroundStyle(.secondary)
-                } else if model.outdatedClones.isEmpty {
-                    Text("\(model.clones.count) 个分身都是最新版本。")
-                        .foregroundStyle(.secondary)
-                } else {
-                    Text("有 \(model.outdatedClones.count) 个分身可更新到微信 \(installation.version)。")
-                    Text("更新后保留登录状态和聊天数据。")
-                        .foregroundStyle(.secondary)
-
-                    Button("全部更新", systemImage: "arrow.triangle.2.circlepath") {
-                        showsUpdateConfirmation = true
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .disabled(model.isRunningCloneOperation)
-                    .confirmationDialog(
-                        "更新 \(model.outdatedClones.count) 个分身？",
-                        isPresented: $showsUpdateConfirmation,
-                        titleVisibility: .visible
-                    ) {
-                        Button("开始更新", action: model.updateAllClones)
-                        Button("取消", role: .cancel) { }
-                    } message: {
-                        Text("请先退出这些分身。旧版本会移入废纸篓。")
-                    }
+            if model.installation != nil, !model.outdatedClones.isEmpty {
+                Button("全部更新", systemImage: "arrow.triangle.2.circlepath") {
+                    showsUpdateConfirmation = true
                 }
-            } else {
-                Text("没有找到微信，请先安装微信。")
-                    .foregroundStyle(.secondary)
+                .buttonStyle(.borderedProminent)
+                .disabled(model.isRunningCloneOperation)
+                .confirmationDialog(
+                    "更新 \(model.outdatedClones.count) 个分身？",
+                    isPresented: $showsUpdateConfirmation,
+                    titleVisibility: .visible
+                ) {
+                    Button("开始更新", action: model.updateAllClones)
+                    Button("取消", role: .cancel) { }
+                }
             }
         }
         .appCard()
     }
 
+    private var statusTitle: String {
+        guard model.installation != nil else { return "请先安装微信" }
+        guard !model.clones.isEmpty else { return "可以创建分身" }
+        guard !model.outdatedClones.isEmpty else { return "分身已是最新" }
+        return "\(model.outdatedClones.count) 个分身可更新"
+    }
+
     private var statusImage: String {
-        model.outdatedClones.isEmpty ? "checkmark.circle.fill" : "exclamationmark.triangle.fill"
+        if model.installation == nil { return "exclamationmark.triangle.fill" }
+        return model.outdatedClones.isEmpty ? "checkmark.circle.fill" : "arrow.triangle.2.circlepath"
+    }
+
+    private var updateDetails: [String] {
+        var details = ["更新会保留登录和聊天数据", "更新前请退出对应分身"]
+        if let installation = model.installation {
+            details.insert("当前微信版本：\(installation.version)", at: 0)
+        }
+        return details
     }
 }

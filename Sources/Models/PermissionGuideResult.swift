@@ -26,4 +26,11 @@ enum PermissionGuideResult: Sendable, Equatable {
         case .needsAction: "exclamationmark.triangle.fill"
         }
     }
+
+    var canContinue: Bool {
+        switch self {
+        case .ready, .unavailable: true
+        case .needsAction: false
+        }
+    }
 }

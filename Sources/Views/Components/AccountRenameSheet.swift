@@ -20,12 +20,15 @@ struct AccountRenameSheet: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: DesignTokens.roomySpacing) {
-            VStack(alignment: .leading, spacing: DesignTokens.compactSpacing) {
+            HStack(alignment: .firstTextBaseline) {
                 Text("给微信账号命名")
                     .font(.title2)
                     .bold()
-                Text("名称只保存在这台 Mac，不会修改微信资料。")
-                    .foregroundStyle(.secondary)
+                InfoButton(
+                    title: "名称说明",
+                    details: ["只保存在这台 Mac", "不会修改微信资料"]
+                )
+                Spacer()
             }
 
             TextField("例如：工作微信", text: $name)

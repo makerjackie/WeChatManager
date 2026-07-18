@@ -7,14 +7,15 @@ struct PlansView: View {
         @Bindable var model = model
         ScrollView {
             VStack(alignment: .leading, spacing: DesignTokens.roomySpacing) {
-                VStack(alignment: .leading, spacing: DesignTokens.compactSpacing) {
-                    Text("方案与更新")
-                        .font(.largeTitle)
-                        .bold()
-                    Text("更新全部分身，也可在新 Mac 恢复。")
-                        .font(.title3)
-                        .foregroundStyle(.secondary)
-                }
+                PageHeader(
+                    title: "更新与方案",
+                    infoTitle: "方案有什么用",
+                    infoDetails: [
+                        "一次更新所有分身",
+                        "保存常用分身数量和名称",
+                        "换 Mac 后可快速重新创建"
+                    ]
+                )
 
                 CloneUpdateCard()
                 PlanSyncCard()

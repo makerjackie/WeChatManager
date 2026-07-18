@@ -5,7 +5,7 @@ struct EnhancementOptionsCard: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: DesignTokens.standardSpacing) {
-            Text("可选功能")
+            Text("选择功能")
                 .font(.headline)
 
             if case let .compatible(availableOptions) = model.compatibility {
@@ -29,9 +29,8 @@ struct EnhancementOptionsCard: View {
                 .padding(.top, DesignTokens.compactSpacing)
             } else {
                 ContentUnavailableView(
-                    "当前没有可安装项",
-                    systemImage: "shippingbox",
-                    description: Text("普通多开和文件管理不受影响。")
+                    "暂无可用功能",
+                    systemImage: "shippingbox"
                 )
             }
         }

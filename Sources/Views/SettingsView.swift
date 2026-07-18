@@ -30,11 +30,20 @@ struct SettingsView: View {
             }
 
             Section("隐私") {
-                Label("微信文件仅在本机处理", systemImage: "internaldrive")
-                Label("iCloud 只同步分身方案", systemImage: "icloud")
-                Label("清理的缓存可从废纸篓恢复", systemImage: "trash")
+                HStack {
+                    Label("数据仅在本机处理", systemImage: "hand.raised.fill")
+                    Spacer()
+                    InfoButton(
+                        title: "隐私说明",
+                        details: [
+                            "不会上传微信文件或聊天内容",
+                            "iCloud 只同步分身数量和名称",
+                            "清理的缓存可从废纸篓恢复"
+                        ]
+                    )
+                }
                 Button(
-                    "查看权限说明",
+                    "权限设置",
                     systemImage: "hand.raised.fill",
                     action: model.showPermissionGuide
                 )
@@ -45,11 +54,18 @@ struct SettingsView: View {
                 )
             }
 
-            Section("使用边界") {
-                Text("不连接或控制腾讯服务器。")
-                    .foregroundStyle(.secondary)
-                Text("本项目与腾讯、微信没有关联。")
-                    .foregroundStyle(.secondary)
+            Section("关于") {
+                HStack {
+                    Text("微信多开助手")
+                    Spacer()
+                    InfoButton(
+                        title: "使用说明",
+                        details: [
+                            "不连接或控制腾讯服务器",
+                            "本项目与腾讯、微信没有关联"
+                        ]
+                    )
+                }
             }
         }
         .formStyle(.grouped)

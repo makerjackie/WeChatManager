@@ -28,7 +28,10 @@ final class WeChatCloneServiceTests: XCTestCase {
             ]
         )
 
-        let clones = await WeChatCloneService(homeDirectory: home).clones()
+        let clones = await WeChatCloneService(
+            homeDirectory: home,
+            managedApplicationsDirectory: applications
+        ).clones()
 
         XCTAssertEqual(clones.count, 1)
         XCTAssertEqual(clones[0].index, 1)

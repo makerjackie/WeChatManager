@@ -30,7 +30,7 @@ actor WeChatDataLocator {
 
         appendIfPresent(
             StorageLocation(
-                title: "微信数据总目录",
+                title: "全部微信文件",
                 detail: "微信 4.x 的账号、聊天文件与数据库入口",
                 url: modernRoot,
                 category: .root,

@@ -11,12 +11,16 @@ struct OfficialInstanceCard: View {
                 .foregroundStyle(installation.isOfficiallySigned ? Color.green : Color.orange)
                 .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: DesignTokens.compactSpacing) {
-                Text("当前微信")
+                Text("微信")
                     .font(.headline)
-                Text("版本 \(installation.version) · \(versionDescription)")
+                Text("当前安装")
                     .foregroundStyle(.secondary)
             }
             Spacer()
+            InfoButton(
+                title: "微信详情",
+                details: ["版本：\(installation.version)", versionDescription]
+            )
             Button("启动", systemImage: "play.fill", action: model.launchOfficial)
                 .buttonStyle(.borderedProminent)
         }

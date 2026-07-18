@@ -213,7 +213,7 @@ final class AppModel {
 
     func requestCleanup() {
         guard !selectedCacheIDs.isEmpty else {
-            message = UserMessage(title: "尚未选择缓存", detail: "请先勾选要移入废纸篓的缓存目录。")
+            message = UserMessage(title: "尚未选择缓存", detail: "请先选择要清理的缓存。")
             return
         }
         showsCleanupConfirmation = true

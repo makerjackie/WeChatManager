@@ -13,20 +13,26 @@ struct WeChatStatusCard: View {
                         .accessibilityHidden(true)
 
                     VStack(alignment: .leading, spacing: DesignTokens.compactSpacing) {
-                        Text("微信 \(installation.version)")
+                        Text("微信已就绪")
                             .font(.title2)
                             .bold()
-                        Text(signatureDescription(installation))
-                            .foregroundStyle(.secondary)
                     }
 
                     Spacer()
+
+                    InfoButton(
+                        title: "当前微信",
+                        details: [
+                            "版本：\(installation.version)",
+                            signatureDescription(installation)
+                        ]
+                    )
 
                     VStack(alignment: .trailing, spacing: DesignTokens.compactSpacing) {
                         Text("\(model.runningInstanceCount)")
                             .font(.largeTitle)
                             .bold()
-                        Text("运行实例")
+                        Text("已打开")
                             .foregroundStyle(.secondary)
                     }
                 }
@@ -34,7 +40,7 @@ struct WeChatStatusCard: View {
                 ContentUnavailableView(
                     "没有找到微信",
                     systemImage: "app.badge",
-                    description: Text("请先从微信官网下载并安装 macOS 版微信。")
+                    description: Text("请先安装微信。")
                 )
             }
         }

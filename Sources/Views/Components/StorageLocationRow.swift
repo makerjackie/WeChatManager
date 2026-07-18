@@ -2,7 +2,6 @@ import SwiftUI
 
 struct StorageLocationRow: View {
     @Environment(AppModel.self) private var model
-    @State private var showsPath = false
     let location: StorageLocation
 
     var body: some View {
@@ -14,12 +13,8 @@ struct StorageLocationRow: View {
                     .frame(width: 28)
                     .accessibilityHidden(true)
 
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(location.title)
-                        .font(.headline)
-                    Text(location.detail)
-                        .foregroundStyle(.secondary)
-                }
+                Text(location.title)
+                    .font(.headline)
 
                 Spacer(minLength: DesignTokens.standardSpacing)
 
@@ -28,6 +23,11 @@ struct StorageLocationRow: View {
                         .monospacedDigit()
                         .foregroundStyle(.secondary)
                 }
+
+                InfoButton(
+                    title: location.title,
+                    details: [location.detail, "文件地址：\(location.url.path)"]
+                )
 
                 if location.isCache {
                     Button(
@@ -49,15 +49,6 @@ struct StorageLocationRow: View {
             }
             .buttonStyle(.borderless)
 
-            DisclosureGroup("文件地址", isExpanded: $showsPath) {
-                Text(location.url.path)
-                    .font(.callout.monospaced())
-                    .foregroundStyle(.secondary)
-                    .textSelection(.enabled)
-                    .padding(.leading, 40)
-            }
-            .font(.callout)
-            .foregroundStyle(.secondary)
         }
         .padding(.vertical, DesignTokens.compactSpacing)
     }

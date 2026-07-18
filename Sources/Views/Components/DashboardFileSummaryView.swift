@@ -19,7 +19,7 @@ struct DashboardFileSummaryView: View {
             }
             if shortcuts.isEmpty {
                 ContentUnavailableView(
-                    "还没有发现微信数据",
+                    "还没有找到微信文件",
                     systemImage: "folder.badge.questionmark",
                     description: Text("登录微信后再刷新即可自动定位。")
                 )
