@@ -10,12 +10,17 @@ final class AppModel {
     var runningInstanceCount = 0
     var storageLocations: [StorageLocation] = []
     var clones: [WeChatClone] = []
+    var clonePlans: [ClonePlan] = []
     var storageSearchText = ""
     var accountAliases: [String: String] = [:]
     var selectedCacheIDs = Set<String>()
     var isRefreshing = false
     var isCalculatingSizes = false
     var isCreatingClone = false
+    var isRunningCloneOperation = false
+    var cloneOperationProgress = 0.0
+    var cloneOperationDescription = ""
+    var isPlanCloudAvailable = false
     var sizeScanProgress = 0.0
     var compatibility: EnhancementCompatibility = .checking
     var selectedEnhancements: Set<EnhancementOption> = [.multiInstance]
@@ -25,6 +30,7 @@ final class AppModel {
     var showsInstallConfirmation = false
     var showsRestoreConfirmation = false
     var showsPermissionGuide = false
+    var showsSavePlanSheet = false
 
     let updateController = UpdateController()
 
@@ -43,14 +49,21 @@ final class AppModel {
     @ObservationIgnored
     private let permissionGuideStore: PermissionGuideStore
     @ObservationIgnored
+    private let clonePlanStore: ClonePlanStore
+    @ObservationIgnored
     private var sizeScanTask: Task<Void, Never>?
 
     init(
         accountNameStore: AccountNameStore = AccountNameStore(),
-        permissionGuideStore: PermissionGuideStore = PermissionGuideStore()
+        permissionGuideStore: PermissionGuideStore = PermissionGuideStore(),
+        clonePlanStore: ClonePlanStore = ClonePlanStore()
     ) {
         self.accountNameStore = accountNameStore
         self.permissionGuideStore = permissionGuideStore
+        self.clonePlanStore = clonePlanStore
+        clonePlanStore.onExternalChange = { [weak self] in
+            self?.reloadClonePlans()
+        }
     }
 
     var visibleStorageAccountGroups: [StorageAccountGroup] {
@@ -94,6 +107,13 @@ final class AppModel {
         selectedCacheIDs.count
     }
 
+    var outdatedClones: [WeChatClone] {
+        guard let installation else { return [] }
+        return clones.filter {
+            !$0.isInstalledInApplicationsFolder || $0.sourceBuild != installation.build
+        }
+    }
+
     var appVersionDescription: String {
         let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "未知"
         let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "未知"
@@ -101,6 +121,7 @@ final class AppModel {
     }
 
     func start() async {
+        reloadClonePlans()
         guard !permissionGuideStore.shouldPresentGuide else {
             showsPermissionGuide = true
             return
@@ -111,6 +132,14 @@ final class AppModel {
     func refresh() {
         guard ensurePermissionGuideCompleted() else { return }
         Task { await refreshContent() }
+    }
+
+    func refreshClonePlans() {
+        reloadClonePlans()
+        message = UserMessage(
+            title: "方案已刷新",
+            detail: isPlanCloudAvailable ? "已读取本机与 iCloud 中的最新方案。" : "当前仅能读取本机方案。"
+        )
     }
 
     func launchOfficial() {
@@ -265,6 +294,76 @@ final class AppModel {
         }
     }
 
+    func saveClonePlan(name: String, selectedCloneIDs: Set<String>) -> Bool {
+        let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedName.isEmpty else {
+            message = UserMessage(title: "方案名称不能为空", detail: "请输入一个容易辨认的方案名称。")
+            return false
+        }
+        let normalizedName = String(trimmedName.prefix(40))
+
+        let selectedClones = clones
+            .filter { selectedCloneIDs.contains($0.id) }
+            .sorted { $0.index < $1.index }
+        guard !selectedClones.isEmpty else {
+            message = UserMessage(title: "尚未选择分身", detail: "请至少选择一个微信分身。")
+            return false
+        }
+        guard selectedClones.count <= 20 else {
+            message = UserMessage(title: "分身数量过多", detail: "一个方案最多保存 20 个微信分身。")
+            return false
+        }
+        guard let installation else {
+            message = UserMessage(title: "没有找到微信", detail: "请先安装官方微信。")
+            return false
+        }
+
+        let existingPlan = clonePlans.first {
+            $0.name.caseInsensitiveCompare(normalizedName) == .orderedSame
+        }
+        let now = Date.now
+        let plan = ClonePlan(
+            id: existingPlan?.id ?? UUID(),
+            name: normalizedName,
+            items: selectedClones.map {
+                ClonePlanItem(index: $0.index, displayName: $0.displayName)
+            },
+            sourceVersion: installation.version,
+            sourceBuild: installation.build,
+            createdAt: existingPlan?.createdAt ?? now,
+            modifiedAt: now
+        )
+        clonePlans.removeAll { $0.id == plan.id }
+        clonePlans.insert(plan, at: 0)
+        isPlanCloudAvailable = clonePlanStore.save(clonePlans)
+        message = UserMessage(
+            title: existingPlan == nil ? "方案已保存" : "方案已更新",
+            detail: isPlanCloudAvailable
+                ? "“\(normalizedName)”已保存并提交到 iCloud，同 Apple ID 的 Mac 可恢复。"
+                : "“\(normalizedName)”已保存在本机；iCloud 当前不可用。"
+        )
+        return true
+    }
+
+    func deleteClonePlan(_ plan: ClonePlan) {
+        clonePlans.removeAll { $0.id == plan.id }
+        isPlanCloudAvailable = clonePlanStore.save(clonePlans)
+        message = UserMessage(
+            title: "方案已删除",
+            detail: "只删除方案记录，不影响已经安装的微信分身及账号数据。"
+        )
+    }
+
+    func applyClonePlan(_ plan: ClonePlan) {
+        guard ensurePermissionGuideCompleted(), !isRunningCloneOperation else { return }
+        Task { await performApplyClonePlan(plan) }
+    }
+
+    func updateAllClones() {
+        guard ensurePermissionGuideCompleted(), !isRunningCloneOperation else { return }
+        Task { await performUpdateAllClones() }
+    }
+
     func launch(_ clone: WeChatClone) {
         Task {
             do {
@@ -411,6 +510,140 @@ final class AppModel {
         hasEnhancementBackup = await backupAvailable
     }
 
+    private func performUpdateAllClones() async {
+        guard let installation else {
+            message = UserMessage(title: "没有找到微信", detail: "请先安装官方微信。")
+            return
+        }
+        let targets = outdatedClones.sorted { $0.index < $1.index }
+        guard !targets.isEmpty else {
+            message = UserMessage(title: "已经是最新版本", detail: "所有分身都与官方微信版本一致。")
+            return
+        }
+        let runningTargets = targets.filter { launchService.isRunning(bundleIdentifier: $0.bundleIdentifier) }
+        guard runningTargets.isEmpty else {
+            message = UserMessage(
+                title: "请先退出待更新分身",
+                detail: "仍在运行：\(runningTargets.map(\.displayName).joined(separator: "、"))。"
+            )
+            return
+        }
+
+        isRunningCloneOperation = true
+        cloneOperationProgress = 0
+        defer {
+            isRunningCloneOperation = false
+            cloneOperationDescription = ""
+        }
+
+        var completedCount = 0
+        for clone in targets {
+            cloneOperationDescription = "正在更新 \(clone.displayName)…"
+            do {
+                _ = try await cloneService.update(clone, from: installation)
+                completedCount += 1
+                cloneOperationProgress = Double(completedCount) / Double(targets.count)
+            } catch {
+                await refreshContent()
+                message = UserMessage(
+                    title: "批量更新未完成",
+                    detail: "已更新 \(completedCount) 个分身；\(clone.displayName) 更新失败：\(error.localizedDescription)"
+                )
+                return
+            }
+        }
+
+        await refreshContent()
+        message = UserMessage(
+            title: "全部分身已更新",
+            detail: "已同步到微信 \(installation.version)，登录状态和独立账号容器保持不变。"
+        )
+    }
+
+    private func performApplyClonePlan(_ plan: ClonePlan) async {
+        guard let installation else {
+            message = UserMessage(title: "没有找到微信", detail: "请先安装官方微信。")
+            return
+        }
+        let items = Array(
+            Dictionary(
+                plan.items.filter { $0.index > 0 }.map { ($0.index, $0) },
+                uniquingKeysWith: { first, _ in first }
+            )
+            .values
+            .sorted { $0.index < $1.index }
+            .prefix(20)
+        )
+        guard !items.isEmpty else {
+            message = UserMessage(title: "方案内容无效", detail: "方案中没有可恢复的微信分身。")
+            return
+        }
+
+        let clonesByIndex = Dictionary(
+            clones.map { ($0.index, $0) },
+            uniquingKeysWith: { preferred, _ in preferred }
+        )
+        let runningClones = items.compactMap { clonesByIndex[$0.index] }.filter {
+            launchService.isRunning(bundleIdentifier: $0.bundleIdentifier)
+        }
+        guard runningClones.isEmpty else {
+            message = UserMessage(
+                title: "请先退出相关分身",
+                detail: "仍在运行：\(runningClones.map(\.displayName).joined(separator: "、"))。"
+            )
+            return
+        }
+
+        isRunningCloneOperation = true
+        cloneOperationProgress = 0
+        defer {
+            isRunningCloneOperation = false
+            cloneOperationDescription = ""
+        }
+
+        var createdCount = 0
+        var updatedCount = 0
+        for (offset, item) in items.enumerated() {
+            cloneOperationDescription = "正在应用 \(item.displayName)…"
+            do {
+                if let clone = clonesByIndex[item.index] {
+                    let needsUpdate = !clone.isInstalledInApplicationsFolder
+                        || clone.sourceBuild != installation.build
+                        || clone.displayName != item.displayName
+                    if needsUpdate {
+                        _ = try await cloneService.update(
+                            clone,
+                            from: installation,
+                            displayName: item.displayName
+                        )
+                        updatedCount += 1
+                    }
+                } else {
+                    _ = try await cloneService.create(
+                        index: item.index,
+                        displayName: item.displayName,
+                        from: installation
+                    )
+                    createdCount += 1
+                }
+                cloneOperationProgress = Double(offset + 1) / Double(items.count)
+            } catch {
+                await refreshContent()
+                message = UserMessage(
+                    title: "方案未完全应用",
+                    detail: "已新建 \(createdCount) 个、更新 \(updatedCount) 个；\(item.displayName) 处理失败：\(error.localizedDescription)"
+                )
+                return
+            }
+        }
+
+        await refreshContent()
+        message = UserMessage(
+            title: "方案已应用",
+            detail: "新建 \(createdCount) 个、更新 \(updatedCount) 个分身；方案外的分身没有删除。新设备上的账号需要重新扫码登录。"
+        )
+    }
+
     private func performSizeScan() async {
         isCalculatingSizes = true
         sizeScanProgress = 0
@@ -539,5 +772,11 @@ final class AppModel {
         guard permissionGuideStore.shouldPresentGuide else { return true }
         showsPermissionGuide = true
         return false
+    }
+
+    private func reloadClonePlans() {
+        let result = clonePlanStore.load()
+        clonePlans = result.plans
+        isPlanCloudAvailable = result.cloudAvailable
     }
 }

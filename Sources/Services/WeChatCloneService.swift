@@ -37,12 +37,42 @@ actor WeChatCloneService {
     func createNext(from installation: WeChatInstallation) async throws -> WeChatClone {
         let usedIndices = Set(clones().map(\.index))
         let index = (1...).first { !usedIndices.contains($0) } ?? 1
-        return try await create(index: index, from: installation, replacing: nil)
+        return try await createClone(
+            index: index,
+            displayName: defaultDisplayName(for: index),
+            from: installation,
+            replacing: nil
+        )
     }
 
-    func update(_ clone: WeChatClone, from installation: WeChatInstallation) async throws -> WeChatClone {
+    func create(
+        index: Int,
+        displayName: String,
+        from installation: WeChatInstallation
+    ) async throws -> WeChatClone {
+        try await createClone(
+            index: index,
+            displayName: normalizedDisplayName(displayName, index: index),
+            from: installation,
+            replacing: nil
+        )
+    }
+
+    func update(
+        _ clone: WeChatClone,
+        from installation: WeChatInstallation,
+        displayName: String? = nil
+    ) async throws -> WeChatClone {
         try validateManagedClone(clone)
-        return try await create(index: clone.index, from: installation, replacing: clone)
+        return try await createClone(
+            index: clone.index,
+            displayName: normalizedDisplayName(
+                displayName ?? clone.displayName,
+                index: clone.index
+            ),
+            from: installation,
+            replacing: clone
+        )
     }
 
     func moveToTrash(_ clone: WeChatClone) throws -> URL {
@@ -59,8 +89,9 @@ actor WeChatCloneService {
         return destination
     }
 
-    private func create(
+    private func createClone(
         index: Int,
+        displayName: String,
         from installation: WeChatInstallation,
         replacing existingClone: WeChatClone?
     ) async throws -> WeChatClone {
@@ -89,6 +120,7 @@ actor WeChatCloneService {
         try rewriteInfoPlist(
             in: temporary,
             index: index,
+            displayName: displayName,
             version: installation.version,
             build: installation.build
         )
@@ -136,6 +168,7 @@ actor WeChatCloneService {
     private func rewriteInfoPlist(
         in applicationURL: URL,
         index: Int,
+        displayName: String,
         version: String,
         build: String
     ) throws {
@@ -152,6 +185,7 @@ actor WeChatCloneService {
         let edited = plistEditor.editedPlist(
             plist,
             index: index,
+            displayName: displayName,
             version: version,
             build: build
         )
@@ -258,5 +292,15 @@ actor WeChatCloneService {
         let base = directory.appending(path: name)
         guard fileManager.fileExists(atPath: base.path) else { return base }
         return directory.appending(path: "\(name)-\(UUID().uuidString)")
+    }
+
+    private func defaultDisplayName(for index: Int) -> String {
+        "微信分身 \(index)"
+    }
+
+    private func normalizedDisplayName(_ displayName: String, index: Int) -> String {
+        let trimmedName = displayName.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedName.isEmpty else { return defaultDisplayName(for: index) }
+        return String(trimmedName.prefix(40))
     }
 }

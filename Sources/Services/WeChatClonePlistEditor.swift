@@ -4,11 +4,11 @@ struct WeChatClonePlistEditor {
     func editedPlist(
         _ plist: [String: Any],
         index: Int,
+        displayName: String,
         version: String,
         build: String
     ) -> [String: Any] {
         var edited = plist
-        let displayName = "微信分身 \(index)"
         edited["CFBundleIdentifier"] = bundleIdentifier(for: index)
         edited["CFBundleName"] = displayName
         edited["CFBundleDisplayName"] = displayName

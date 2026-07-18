@@ -32,6 +32,8 @@ struct SettingsView: View {
             Section("隐私") {
                 Text("所有微信文件扫描都在本机完成。应用不上传文件名、聊天记录、账号信息或目录内容。")
                     .foregroundStyle(.secondary)
+                Text("iCloud 只同步方案名称、分身数量、显示名称和来源版本，不同步聊天记录、登录状态或微信文件。")
+                    .foregroundStyle(.secondary)
                 Text("缓存清理只会把明确选择的缓存目录移入废纸篓，不会静默永久删除。")
                     .foregroundStyle(.secondary)
                 Button(

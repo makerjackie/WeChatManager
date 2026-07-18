@@ -12,12 +12,13 @@ final class WeChatClonePlistEditorTests: XCTestCase {
         let edited = WeChatClonePlistEditor().editedPlist(
             original,
             index: 2,
+            displayName: "工作微信",
             version: "4.1.11",
             build: "269110"
         )
 
         XCTAssertEqual(edited["CFBundleIdentifier"] as? String, "com.makerjackie.WeChatManager.clone.2")
-        XCTAssertEqual(edited["CFBundleDisplayName"] as? String, "微信分身 2")
+        XCTAssertEqual(edited["CFBundleDisplayName"] as? String, "工作微信")
         XCTAssertEqual(edited["WeChatManagerClone"] as? Bool, true)
         XCTAssertEqual(edited["WeChatManagerCloneIndex"] as? Int, 2)
         XCTAssertEqual(edited["WeChatManagerSourceBuild"] as? String, "269110")

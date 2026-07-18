@@ -15,10 +15,15 @@
 		071509A248B328DBD9CA9F89 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F0427B50D33A7645A74DE6AF /* Assets.xcassets */; };
 		0A3E3BD0A38BDEA69AA7A214 /* PermissionGuideIntroductionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E59CBE9DECCED6CA7F704C9E /* PermissionGuideIntroductionView.swift */; };
 		0B48E2F0DBD4B9796B7CDE4C /* PermissionGuideProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F6C602D884CD2BE663490E2 /* PermissionGuideProgressView.swift */; };
+		0C64A9BC5EAA8D14F5907184 /* ClonePlanRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8A6D2B18B0E9889EF22E231 /* ClonePlanRow.swift */; };
+		1437BC34E107121E4DF59D42 /* ClonePlanDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 446C424F1B129F4A04D74150 /* ClonePlanDocument.swift */; };
 		19459F0FCB9AAAF105BC5E7F /* CommandResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A46BB81BA5A694DE7CFF9D7 /* CommandResult.swift */; };
 		1B5F032570368CB925EEDE29 /* PermissionGuideStep.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42DCC4B65F0CBE45A52ACC44 /* PermissionGuideStep.swift */; };
 		1CAD806BC0AB1E6116DD4F6D /* PatchEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9554AA0EBD136E085CB8B20F /* PatchEntry.swift */; };
+		207CE3C736F96BAD8F126646 /* PlansView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57FE9B1E7F2E730460E95839 /* PlansView.swift */; };
+		20E466D2898EA2C8AB15B235 /* ClonePlanSelectionRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62D3CF3CDB16BDF904C9DBAC /* ClonePlanSelectionRow.swift */; };
 		251EBAF253D1C407C6C41811 /* WeChatLaunchService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE31B135D40D69AB87B280D1 /* WeChatLaunchService.swift */; };
+		29943297DB3640D9861E64F1 /* SaveClonePlanSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 074FA111A41CFEBFE6B28CC1 /* SaveClonePlanSheet.swift */; };
 		2B98D9ACE278FB3EFBEF844C /* WeChatCloneService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8722175073CC5DC1D885FA2 /* WeChatCloneService.swift */; };
 		2C076FD130610A2364638B34 /* AppError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BFA3EF7C444003D5BA1D5E2 /* AppError.swift */; };
 		2CE7526520551231C989B63E /* UpstreamConfigurationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A17491B1F6F282F2A9BB69 /* UpstreamConfigurationService.swift */; };
@@ -26,6 +31,7 @@
 		2D4C49551CE553BEB7798EF5 /* WeChatDataLocatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDA8AEB9B1161E902C4FF4DE /* WeChatDataLocatorTests.swift */; };
 		308AEFA4CC62B41BB037CD06 /* EnhancementOptionsCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BEF8418389990EAD3F48FA8 /* EnhancementOptionsCard.swift */; };
 		319F2A12BA243ABD68E652ED /* AccountStorageSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB56AC205FB1C1C20ED59C00 /* AccountStorageSection.swift */; };
+		35956AAE85EFDF4E59665CA1 /* ClonePlanItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE3BF99D12D98F5DD2FE07A8 /* ClonePlanItem.swift */; };
 		3A8879B13CC8EFBDF9E4664E /* CacheCleaner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BCA9BF62D6B89C31145F636 /* CacheCleaner.swift */; };
 		3B51305779FBF297506747DE /* CacheCleanupBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = B98B2FE1B912647B097AC2B5 /* CacheCleanupBar.swift */; };
 		3B58951418B2586C43A18CBC /* QuickActionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9D070D42D357667B260C3CE /* QuickActionsView.swift */; };
@@ -33,11 +39,13 @@
 		3D9499BDD272143496C341EB /* OfficialInstanceCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CF1F3AC302943EB65461BEA /* OfficialInstanceCard.swift */; };
 		40818CE6D4F6DCAAF5BA1376 /* StorageLocationRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0212AF2224FC93A1BCF294D7 /* StorageLocationRow.swift */; };
 		41DEF8D7F554CB6F9E4A68AF /* PermissionGuideStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 055C0B87C17FF1C66F29F8B4 /* PermissionGuideStoreTests.swift */; };
+		43237E3BF3EB7E3845CCC665 /* ClonePlan.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04A02EDC307EB776C95CB516 /* ClonePlan.swift */; };
 		433D46FE9DE2AFC7AA29A915 /* AppCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5EBD0B3ABF1C38C474A693F /* AppCommands.swift */; };
 		4387D401227862A82E2C460A /* UpdateController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4363479A3918C9DBCD5B12E3 /* UpdateController.swift */; };
 		477EEFB193DFAE892773050C /* StorageScannerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 202A0E5022E3385211FC3527 /* StorageScannerTests.swift */; };
 		4856DDB84601D09554C2196C /* StorageCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E219A76207D0F2960E6C7E4 /* StorageCategory.swift */; };
 		4A84B374968EF69952E28399 /* AdditionalStorageSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E952EFAABC477F798849B0A /* AdditionalStorageSection.swift */; };
+		4D38DF8FC011B5B9C94FDA38 /* PlanSyncCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D2FE3C7EE07E46CDC4361A9 /* PlanSyncCard.swift */; };
 		5DE69CB3338E893214B51ED3 /* WeChatDataScan.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81EF3A70E416D90F53D7BECD /* WeChatDataScan.swift */; };
 		5EFE34A84AFF315C55ACC23A /* Data+Hexadecimal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BC1B2C2204B1FEBEE3E36E1 /* Data+Hexadecimal.swift */; };
 		615137B12E3FA623070DB89F /* WeChatStatusCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = EACFAF12399D19A27C751EFC /* WeChatStatusCard.swift */; };
@@ -51,7 +59,9 @@
 		7004E0F312C0E19C2B4D8E01 /* PermissionGuideOverviewRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D65E78F5C0E71167CFFC628 /* PermissionGuideOverviewRow.swift */; };
 		714D3BDDE9909FBC3FD384D9 /* WeChatClone.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EF44B107093CC7A12A51E3E /* WeChatClone.swift */; };
 		795B0CFC16243E75863A189F /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C1D286506452A7815783A42 /* SettingsView.swift */; };
+		7C757FE2D966897A2E4C7C4C /* ClonePlanDocumentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5B3BC934995680BB643FC53 /* ClonePlanDocumentTests.swift */; };
 		7D095EBD563F49BBB3184AF9 /* PermissionGuideAccessView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D738468D314BCAEECE207191 /* PermissionGuideAccessView.swift */; };
+		7F70C472FC4970C8429AF10E /* CloneUpdateCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5EA689AB61DE33D88BA1917 /* CloneUpdateCard.swift */; };
 		7F9BE2193C71F8CADF7D0D49 /* ManagedCloneRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 308B7EF9D48D4C1FD11777AA /* ManagedCloneRow.swift */; };
 		881FC8F412237151DA1004E2 /* AccountNameStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE3260059EDDFFA57B9A3E9A /* AccountNameStore.swift */; };
 		8ADAAC1C3C8FAFA0EF389AAE /* PermissionGuideView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FE760CDA599BFED9820E922 /* PermissionGuideView.swift */; };
@@ -63,6 +73,7 @@
 		937E70650ECEC27985B3F985 /* View+AppCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78031F0B32EF19B362A77519 /* View+AppCard.swift */; };
 		9B51EDAD7D9C0BC2181F6E21 /* PermissionGuideResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE570D903B7086CC909F12E7 /* PermissionGuideResult.swift */; };
 		9CA998B308266588B5D83B27 /* CodeSignatureInspector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F229FD7B9723EE2A91CB6AC /* CodeSignatureInspector.swift */; };
+		9CC0DE37855DC0E1B5D11EBF /* ClonePlanStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BA269E0B095E61973EA1EA2 /* ClonePlanStore.swift */; };
 		9EAEB89401292EEC5836EC97 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53AA76C35B3542E771C7F6C6 /* RootView.swift */; };
 		A630C295AEAEDBA77B9BF5FC /* AccountNameStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53785D4955F098D357F602AB /* AccountNameStoreTests.swift */; };
 		AB172A1F6BE29159D362720A /* CacheCleanerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 541C10332937BDC9C20FFBFB /* CacheCleanerTests.swift */; };
@@ -72,6 +83,7 @@
 		B58C55B88B984A814F84300A /* EnhancementsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E900394545501C4C04D9E428 /* EnhancementsView.swift */; };
 		B8A420D8CF88B580C9F0A6A2 /* EnhancementSafetyCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21588CFE549AECCDF4838CF1 /* EnhancementSafetyCard.swift */; };
 		B8E160047158155C31BB107F /* AppConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCD64D4A9F45AC3BE973E1B2 /* AppConstants.swift */; };
+		B9CC09A545E7BAFFA8A8379F /* ClonePlanStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13E5344EBCE1C9756588013D /* ClonePlanStoreTests.swift */; };
 		BA05EFA21C80A52A60F67ABB /* DashboardFileSummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E11997D431BD7A17361ACE5D /* DashboardFileSummaryView.swift */; };
 		BFD94D981FCBE96019204A3F /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F0BBA64D92F773E8694B728 /* DashboardView.swift */; };
 		C0D0B93077C843B3DA225BA8 /* PatchConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C014FEE28FDF053DE06225 /* PatchConfiguration.swift */; };
@@ -90,12 +102,14 @@
 		E54E4D3E7CB7F378D4C5FE49 /* PermissionGuideStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F005342965E39F3BB59E40EE /* PermissionGuideStore.swift */; };
 		E7352C704CF54468AC749451 /* ClonePrivacyCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC8A1270A1EF8467A14BC486 /* ClonePrivacyCard.swift */; };
 		E746D8FBF18E7A1A355FE6AA /* EnhancementOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE35424237C2063572AE1D77 /* EnhancementOption.swift */; };
+		E7C0D7620D4E938F226D6F5E /* CloneUpdateNotice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0317135AD069CE498D55EE32 /* CloneUpdateNotice.swift */; };
 		E8F2BEAFB9B19DF5EBBF544C /* WeChatClonePlistEditorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B27DD28098B82E27D2356E /* WeChatClonePlistEditorTests.swift */; };
 		EA62E2462C3F70B10A0610B5 /* PatchEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BC7502D6E5B9F275EA3A4C /* PatchEngineTests.swift */; };
 		EDCAF7C92484925BBFAEA037 /* CommandRunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B7E6F746A089F6664A869E2 /* CommandRunnerTests.swift */; };
 		F07EBE5CBAA419CA1E013665 /* StorageAccountGroupTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 719BF9EBEF0E14374DAC97C7 /* StorageAccountGroupTests.swift */; };
 		F58406574F9722E0DFA952F1 /* UserMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8018FB2FBD166E9C478B1621 /* UserMessage.swift */; };
 		F60B3BD909C96EB2020B7493 /* WeChatInstallation.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDB9242049DCAB7F0119AC3E /* WeChatInstallation.swift */; };
+		F84AFDB51B317B32CAFE00A0 /* ClonePlanStoreBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3789179AB3869F40DB1C7E8 /* ClonePlanStoreBackend.swift */; };
 		FB5B15DD1081B94584797ED9 /* WeChatCloneServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1C6773A95B1E30D3A287A91 /* WeChatCloneServiceTests.swift */; };
 /* End PBXBuildFile section */
 
@@ -112,11 +126,15 @@
 /* Begin PBXFileReference section */
 		0212AF2224FC93A1BCF294D7 /* StorageLocationRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageLocationRow.swift; sourceTree = "<group>"; };
 		030E1681473FA52BEA1B7058 /* FileManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileManagerView.swift; sourceTree = "<group>"; };
+		0317135AD069CE498D55EE32 /* CloneUpdateNotice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloneUpdateNotice.swift; sourceTree = "<group>"; };
+		04A02EDC307EB776C95CB516 /* ClonePlan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClonePlan.swift; sourceTree = "<group>"; };
 		04FFED277BB5A6109FCFF4BE /* InstancesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstancesView.swift; sourceTree = "<group>"; };
 		055C0B87C17FF1C66F29F8B4 /* PermissionGuideStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionGuideStoreTests.swift; sourceTree = "<group>"; };
 		0579B4105763F3D7EE708015 /* SidebarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarView.swift; sourceTree = "<group>"; };
+		074FA111A41CFEBFE6B28CC1 /* SaveClonePlanSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveClonePlanSheet.swift; sourceTree = "<group>"; };
 		0BC1B2C2204B1FEBEE3E36E1 /* Data+Hexadecimal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Data+Hexadecimal.swift"; sourceTree = "<group>"; };
 		0C1D286506452A7815783A42 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		13E5344EBCE1C9756588013D /* ClonePlanStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClonePlanStoreTests.swift; sourceTree = "<group>"; };
 		19ED0593B4974A8347B32123 /* CompatibilityCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompatibilityCard.swift; sourceTree = "<group>"; };
 		1AF9D5ACECC7FC6966B72DF2 /* StorageScanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageScanner.swift; sourceTree = "<group>"; };
 		1BFA3EF7C444003D5BA1D5E2 /* AppError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppError.swift; sourceTree = "<group>"; };
@@ -124,6 +142,7 @@
 		21588CFE549AECCDF4838CF1 /* EnhancementSafetyCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnhancementSafetyCard.swift; sourceTree = "<group>"; };
 		222C8A6D3635AFBEA2F21DDB /* FileManagerIntroRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileManagerIntroRow.swift; sourceTree = "<group>"; };
 		28A17491B1F6F282F2A9BB69 /* UpstreamConfigurationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpstreamConfigurationService.swift; sourceTree = "<group>"; };
+		2BA269E0B095E61973EA1EA2 /* ClonePlanStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClonePlanStore.swift; sourceTree = "<group>"; };
 		2D66DC8DC15CBCAD2196817C /* WeChatManager.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WeChatManager.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2E952EFAABC477F798849B0A /* AdditionalStorageSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdditionalStorageSection.swift; sourceTree = "<group>"; };
 		308B7EF9D48D4C1FD11777AA /* ManagedCloneRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManagedCloneRow.swift; sourceTree = "<group>"; };
@@ -134,6 +153,7 @@
 		42DCC4B65F0CBE45A52ACC44 /* PermissionGuideStep.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionGuideStep.swift; sourceTree = "<group>"; };
 		43288B6DA3C81CAB6E070CF6 /* PatchEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PatchEngine.swift; sourceTree = "<group>"; };
 		4363479A3918C9DBCD5B12E3 /* UpdateController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateController.swift; sourceTree = "<group>"; };
+		446C424F1B129F4A04D74150 /* ClonePlanDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClonePlanDocument.swift; sourceTree = "<group>"; };
 		4E219A76207D0F2960E6C7E4 /* StorageCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageCategory.swift; sourceTree = "<group>"; };
 		4E3B9A8D103F921451DB28C5 /* CleanupResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CleanupResult.swift; sourceTree = "<group>"; };
 		4EF44B107093CC7A12A51E3E /* WeChatClone.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeChatClone.swift; sourceTree = "<group>"; };
@@ -142,7 +162,9 @@
 		53AA76C35B3542E771C7F6C6 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		541C10332937BDC9C20FFBFB /* CacheCleanerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CacheCleanerTests.swift; sourceTree = "<group>"; };
 		55CE9D2A33BD29775EF28DB4 /* WeChatManagerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeChatManagerApp.swift; sourceTree = "<group>"; };
+		57FE9B1E7F2E730460E95839 /* PlansView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlansView.swift; sourceTree = "<group>"; };
 		5A57A9082387840D9B85F81D /* AccountRenameSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountRenameSheet.swift; sourceTree = "<group>"; };
+		62D3CF3CDB16BDF904C9DBAC /* ClonePlanSelectionRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClonePlanSelectionRow.swift; sourceTree = "<group>"; };
 		672E897073E7FD997E4C1F86 /* DesignTokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignTokens.swift; sourceTree = "<group>"; };
 		6FE760CDA599BFED9820E922 /* PermissionGuideView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionGuideView.swift; sourceTree = "<group>"; };
 		719BF9EBEF0E14374DAC97C7 /* StorageAccountGroupTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageAccountGroupTests.swift; sourceTree = "<group>"; };
@@ -164,6 +186,7 @@
 		9A46BB81BA5A694DE7CFF9D7 /* CommandResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommandResult.swift; sourceTree = "<group>"; };
 		9A7A15D029693E6FE85D9E1B /* ShellEscapingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShellEscapingTests.swift; sourceTree = "<group>"; };
 		9B7E6F746A089F6664A869E2 /* CommandRunnerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommandRunnerTests.swift; sourceTree = "<group>"; };
+		9D2FE3C7EE07E46CDC4361A9 /* PlanSyncCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanSyncCard.swift; sourceTree = "<group>"; };
 		9EABCA7ADCC8F0BABE6B924E /* PatchArchitecture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PatchArchitecture.swift; sourceTree = "<group>"; };
 		A5EBD0B3ABF1C38C474A693F /* AppCommands.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppCommands.swift; sourceTree = "<group>"; };
 		A7CE2D8726DDDE5B545BC29B /* WeChatManagerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WeChatManagerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -174,6 +197,7 @@
 		AE31B135D40D69AB87B280D1 /* WeChatLaunchService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeChatLaunchService.swift; sourceTree = "<group>"; };
 		AE3260059EDDFFA57B9A3E9A /* AccountNameStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountNameStore.swift; sourceTree = "<group>"; };
 		B32044D054810DC27FB9C852 /* PermissionGuideResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionGuideResultView.swift; sourceTree = "<group>"; };
+		B3789179AB3869F40DB1C7E8 /* ClonePlanStoreBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClonePlanStoreBackend.swift; sourceTree = "<group>"; };
 		B5216946E8A5C468337E5830 /* WeChatDataLocator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeChatDataLocator.swift; sourceTree = "<group>"; };
 		B98B2FE1B912647B097AC2B5 /* CacheCleanupBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CacheCleanupBar.swift; sourceTree = "<group>"; };
 		BF632F11B7A6E879707E5FC4 /* SidebarStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarStatusView.swift; sourceTree = "<group>"; };
@@ -190,6 +214,8 @@
 		E256174012BBAACC5212BB43 /* ByteOrder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ByteOrder.swift; sourceTree = "<group>"; };
 		E2EB98F6F0EB9EA13DF98C1D /* StorageAccountGroup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageAccountGroup.swift; sourceTree = "<group>"; };
 		E59CBE9DECCED6CA7F704C9E /* PermissionGuideIntroductionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionGuideIntroductionView.swift; sourceTree = "<group>"; };
+		E5B3BC934995680BB643FC53 /* ClonePlanDocumentTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClonePlanDocumentTests.swift; sourceTree = "<group>"; };
+		E8A6D2B18B0E9889EF22E231 /* ClonePlanRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClonePlanRow.swift; sourceTree = "<group>"; };
 		E900394545501C4C04D9E428 /* EnhancementsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnhancementsView.swift; sourceTree = "<group>"; };
 		EACFAF12399D19A27C751EFC /* WeChatStatusCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeChatStatusCard.swift; sourceTree = "<group>"; };
 		EDA8AEB9B1161E902C4FF4DE /* WeChatDataLocatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeChatDataLocatorTests.swift; sourceTree = "<group>"; };
@@ -197,10 +223,12 @@
 		F005342965E39F3BB59E40EE /* PermissionGuideStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionGuideStore.swift; sourceTree = "<group>"; };
 		F0427B50D33A7645A74DE6AF /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F3F4015C98B7B90A7802E256 /* PrivilegedCommandRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivilegedCommandRunner.swift; sourceTree = "<group>"; };
+		F5EA689AB61DE33D88BA1917 /* CloneUpdateCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloneUpdateCard.swift; sourceTree = "<group>"; };
 		F80A849AEE042740D7806A24 /* ShellEscaping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShellEscaping.swift; sourceTree = "<group>"; };
 		F8722175073CC5DC1D885FA2 /* WeChatCloneService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeChatCloneService.swift; sourceTree = "<group>"; };
 		FB56AC205FB1C1C20ED59C00 /* AccountStorageSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountStorageSection.swift; sourceTree = "<group>"; };
 		FCD64D4A9F45AC3BE973E1B2 /* AppConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConstants.swift; sourceTree = "<group>"; };
+		FE3BF99D12D98F5DD2FE07A8 /* ClonePlanItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClonePlanItem.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -222,7 +250,11 @@
 				FB56AC205FB1C1C20ED59C00 /* AccountStorageSection.swift */,
 				2E952EFAABC477F798849B0A /* AdditionalStorageSection.swift */,
 				B98B2FE1B912647B097AC2B5 /* CacheCleanupBar.swift */,
+				E8A6D2B18B0E9889EF22E231 /* ClonePlanRow.swift */,
+				62D3CF3CDB16BDF904C9DBAC /* ClonePlanSelectionRow.swift */,
 				AC8A1270A1EF8467A14BC486 /* ClonePrivacyCard.swift */,
+				F5EA689AB61DE33D88BA1917 /* CloneUpdateCard.swift */,
+				0317135AD069CE498D55EE32 /* CloneUpdateNotice.swift */,
 				19ED0593B4974A8347B32123 /* CompatibilityCard.swift */,
 				E11997D431BD7A17361ACE5D /* DashboardFileSummaryView.swift */,
 				A812F641D8BCE9E121C93EC4 /* EnhancementOptionRow.swift */,
@@ -231,7 +263,9 @@
 				222C8A6D3635AFBEA2F21DDB /* FileManagerIntroRow.swift */,
 				308B7EF9D48D4C1FD11777AA /* ManagedCloneRow.swift */,
 				8CF1F3AC302943EB65461BEA /* OfficialInstanceCard.swift */,
+				9D2FE3C7EE07E46CDC4361A9 /* PlanSyncCard.swift */,
 				C9D070D42D357667B260C3CE /* QuickActionsView.swift */,
+				074FA111A41CFEBFE6B28CC1 /* SaveClonePlanSheet.swift */,
 				BF632F11B7A6E879707E5FC4 /* SidebarStatusView.swift */,
 				0212AF2224FC93A1BCF294D7 /* StorageLocationRow.swift */,
 				78031F0B32EF19B362A77519 /* View+AppCard.swift */,
@@ -265,6 +299,9 @@
 				1BFA3EF7C444003D5BA1D5E2 /* AppError.swift */,
 				E256174012BBAACC5212BB43 /* ByteOrder.swift */,
 				4E3B9A8D103F921451DB28C5 /* CleanupResult.swift */,
+				04A02EDC307EB776C95CB516 /* ClonePlan.swift */,
+				446C424F1B129F4A04D74150 /* ClonePlanDocument.swift */,
+				FE3BF99D12D98F5DD2FE07A8 /* ClonePlanItem.swift */,
 				9A46BB81BA5A694DE7CFF9D7 /* CommandResult.swift */,
 				0BC1B2C2204B1FEBEE3E36E1 /* Data+Hexadecimal.swift */,
 				672E897073E7FD997E4C1F86 /* DesignTokens.swift */,
@@ -307,6 +344,7 @@
 				E900394545501C4C04D9E428 /* EnhancementsView.swift */,
 				030E1681473FA52BEA1B7058 /* FileManagerView.swift */,
 				04FFED277BB5A6109FCFF4BE /* InstancesView.swift */,
+				57FE9B1E7F2E730460E95839 /* PlansView.swift */,
 				53AA76C35B3542E771C7F6C6 /* RootView.swift */,
 				0C1D286506452A7815783A42 /* SettingsView.swift */,
 				0579B4105763F3D7EE708015 /* SidebarView.swift */,
@@ -321,6 +359,7 @@
 			children = (
 				53785D4955F098D357F602AB /* AccountNameStoreTests.swift */,
 				541C10332937BDC9C20FFBFB /* CacheCleanerTests.swift */,
+				13E5344EBCE1C9756588013D /* ClonePlanStoreTests.swift */,
 				9B7E6F746A089F6664A869E2 /* CommandRunnerTests.swift */,
 				50BC7502D6E5B9F275EA3A4C /* PatchEngineTests.swift */,
 				055C0B87C17FF1C66F29F8B4 /* PermissionGuideStoreTests.swift */,
@@ -336,6 +375,7 @@
 		A553261C4C847D944A51E309 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				E5B3BC934995680BB643FC53 /* ClonePlanDocumentTests.swift */,
 				C766754C0F08716DFF1FD38F /* PatchConfigurationTests.swift */,
 				719BF9EBEF0E14374DAC97C7 /* StorageAccountGroupTests.swift */,
 			);
@@ -367,6 +407,8 @@
 			children = (
 				AE3260059EDDFFA57B9A3E9A /* AccountNameStore.swift */,
 				8BCA9BF62D6B89C31145F636 /* CacheCleaner.swift */,
+				2BA269E0B095E61973EA1EA2 /* ClonePlanStore.swift */,
+				B3789179AB3869F40DB1C7E8 /* ClonePlanStoreBackend.swift */,
 				3F229FD7B9723EE2A91CB6AC /* CodeSignatureInspector.swift */,
 				81F40FD92F70664761DA3624 /* CommandRunner.swift */,
 				AA3F02654E990CA13EF48A0C /* EnhancementService.swift */,
@@ -520,7 +562,16 @@
 				3A8879B13CC8EFBDF9E4664E /* CacheCleaner.swift in Sources */,
 				3B51305779FBF297506747DE /* CacheCleanupBar.swift in Sources */,
 				C77230F51686D251552EE449 /* CleanupResult.swift in Sources */,
+				43237E3BF3EB7E3845CCC665 /* ClonePlan.swift in Sources */,
+				1437BC34E107121E4DF59D42 /* ClonePlanDocument.swift in Sources */,
+				35956AAE85EFDF4E59665CA1 /* ClonePlanItem.swift in Sources */,
+				0C64A9BC5EAA8D14F5907184 /* ClonePlanRow.swift in Sources */,
+				20E466D2898EA2C8AB15B235 /* ClonePlanSelectionRow.swift in Sources */,
+				9CC0DE37855DC0E1B5D11EBF /* ClonePlanStore.swift in Sources */,
+				F84AFDB51B317B32CAFE00A0 /* ClonePlanStoreBackend.swift in Sources */,
 				E7352C704CF54468AC749451 /* ClonePrivacyCard.swift in Sources */,
+				7F70C472FC4970C8429AF10E /* CloneUpdateCard.swift in Sources */,
+				E7C0D7620D4E938F226D6F5E /* CloneUpdateNotice.swift in Sources */,
 				9CA998B308266588B5D83B27 /* CodeSignatureInspector.swift in Sources */,
 				19459F0FCB9AAAF105BC5E7F /* CommandResult.swift in Sources */,
 				B1188B0785841E5390EE6ADD /* CommandRunner.swift in Sources */,
@@ -558,9 +609,12 @@
 				1B5F032570368CB925EEDE29 /* PermissionGuideStep.swift in Sources */,
 				E54E4D3E7CB7F378D4C5FE49 /* PermissionGuideStore.swift in Sources */,
 				8ADAAC1C3C8FAFA0EF389AAE /* PermissionGuideView.swift in Sources */,
+				4D38DF8FC011B5B9C94FDA38 /* PlanSyncCard.swift in Sources */,
+				207CE3C736F96BAD8F126646 /* PlansView.swift in Sources */,
 				E3D6271B77EA19E9C2C39CAC /* PrivilegedCommandRunner.swift in Sources */,
 				3B58951418B2586C43A18CBC /* QuickActionsView.swift in Sources */,
 				9EAEB89401292EEC5836EC97 /* RootView.swift in Sources */,
+				29943297DB3640D9861E64F1 /* SaveClonePlanSheet.swift in Sources */,
 				795B0CFC16243E75863A189F /* SettingsView.swift in Sources */,
 				045C0FFCCE775297AA98AD43 /* ShellEscaping.swift in Sources */,
 				CDD057E559BADA71C72D8B60 /* SidebarStatusView.swift in Sources */,
@@ -592,6 +646,8 @@
 			files = (
 				A630C295AEAEDBA77B9BF5FC /* AccountNameStoreTests.swift in Sources */,
 				AB172A1F6BE29159D362720A /* CacheCleanerTests.swift in Sources */,
+				7C757FE2D966897A2E4C7C4C /* ClonePlanDocumentTests.swift in Sources */,
+				B9CC09A545E7BAFFA8A8379F /* ClonePlanStoreTests.swift in Sources */,
 				EDCAF7C92484925BBFAEA037 /* CommandRunnerTests.swift in Sources */,
 				62CEE651C754777A7C5C9F28 /* PatchConfigurationTests.swift in Sources */,
 				EA62E2462C3F70B10A0610B5 /* PatchEngineTests.swift in Sources */,

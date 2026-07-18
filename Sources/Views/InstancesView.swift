@@ -42,6 +42,9 @@ struct InstancesView: View {
         .navigationTitle("分身管理")
         .toolbar {
             ToolbarItemGroup(placement: .primaryAction) {
+                Button("方案与更新", systemImage: "arrow.triangle.2.circlepath.icloud") {
+                    model.selectedPage = .plans
+                }
                 Button("创建分身", systemImage: "plus", action: model.createClone)
                     .disabled(model.installation == nil || model.isCreatingClone)
                 Button("刷新", systemImage: "arrow.clockwise", action: model.refresh)

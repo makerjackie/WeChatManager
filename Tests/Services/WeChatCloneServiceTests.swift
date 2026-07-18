@@ -118,6 +118,42 @@ final class WeChatCloneServiceTests: XCTestCase {
         XCTAssertEqual(try FileManager.default.contentsOfDirectory(atPath: trash.path).count, 1)
     }
 
+    func testCreatesExactPlanIndexAndPreservesDisplayNameWhenUpdating() async throws {
+        let root = FileManager.default.temporaryDirectory.appending(
+            path: "WeChatClonePlanRestoreTests-\(UUID().uuidString)"
+        )
+        defer { try? FileManager.default.removeItem(at: root) }
+        let home = root.appending(path: "home")
+        let applications = root.appending(path: "Applications")
+        let trash = root.appending(path: "Trash")
+        let source = root.appending(path: "WeChat.app")
+        try FileManager.default.createDirectory(at: home, withIntermediateDirectories: true)
+        try writeRunnableApplication(at: source)
+        let installation = WeChatInstallation(
+            applicationURL: source,
+            version: "4.1.11",
+            build: "269110",
+            teamIdentifier: AppConstants.officialWeChatTeamIdentifier
+        )
+        let service = WeChatCloneService(
+            homeDirectory: home,
+            managedApplicationsDirectory: applications,
+            trashDirectory: trash
+        )
+
+        let created = try await service.create(
+            index: 3,
+            displayName: "工作微信",
+            from: installation
+        )
+        let updated = try await service.update(created, from: installation)
+
+        XCTAssertEqual(created.index, 3)
+        XCTAssertEqual(created.displayName, "工作微信")
+        XCTAssertEqual(updated.displayName, "工作微信")
+        XCTAssertEqual(updated.bundleIdentifier, "com.makerjackie.WeChatManager.clone.3")
+    }
+
     private func writeApplication(at applicationURL: URL, plist: [String: Any]) throws {
         let contents = applicationURL.appending(path: "Contents")
         try FileManager.default.createDirectory(at: contents, withIntermediateDirectories: true)

@@ -51,14 +51,14 @@ xcrun stapler validate "$APP_PATH"
 mkdir -p "$UPDATES_PATH"
 "$PROJECT_ROOT/scripts/create-dmg.sh" "$APP_PATH" "$DMG_PATH"
 cp "$PROJECT_ROOT/CHANGELOG.md" "$UPDATES_PATH/WeChatManager.md"
-(
-  cd "$UPDATES_PATH"
-  shasum -a 256 "$(basename "$DMG_PATH")" > "$(basename "$DMG_PATH").sha256"
-)
 asc notarization submit --file "$DMG_PATH" --wait --timeout 1h
 xcrun stapler staple "$DMG_PATH"
 xcrun stapler validate "$DMG_PATH"
 spctl --assess --type open --context context:primary-signature --verbose=2 "$DMG_PATH"
+(
+  cd "$UPDATES_PATH"
+  shasum -a 256 "$(basename "$DMG_PATH")" > "$(basename "$DMG_PATH").sha256"
+)
 
 if [ ! -x "$SPARKLE_TOOLS/generate_appcast" ]; then
   xcodebuild -resolvePackageDependencies \

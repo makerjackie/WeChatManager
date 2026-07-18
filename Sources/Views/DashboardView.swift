@@ -16,6 +16,7 @@ struct DashboardView: View {
                 }
 
                 WeChatStatusCard()
+                CloneUpdateNotice()
                 QuickActionsView()
                 DashboardFileSummaryView()
             }

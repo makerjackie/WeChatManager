@@ -9,6 +9,8 @@ struct DestinationView: View {
             DashboardView()
         case .instances:
             InstancesView()
+        case .plans:
+            PlansView()
         case .files:
             FileManagerView()
         case .enhancements:
