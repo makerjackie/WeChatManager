@@ -726,7 +726,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.makerjackie.WeChatManager;
+				PRODUCT_BUNDLE_IDENTIFIER = com.makerjackie.WeChatManager.debug;
 				PRODUCT_NAME = WeChatManager;
 				SDKROOT = macosx;
 			};

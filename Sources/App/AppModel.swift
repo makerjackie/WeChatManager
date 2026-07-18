@@ -362,7 +362,7 @@ final class AppModel {
     }
 
     func requestWeChatDataAccess() async -> PermissionGuideResult {
-        let scan = await dataLocator.scan(permissionPromptTimeout: 45)
+        let scan = await dataLocator.scan()
         applyStorageLocations(scan.locations)
 
         switch scan.accessState {

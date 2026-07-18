@@ -3,23 +3,20 @@ import Foundation
 actor WeChatDataLocator {
     private let homeDirectory: URL
     private let fileManager: FileManager
-    private let commandRunner: CommandRunner
 
     init(
         homeDirectory: URL = .homeDirectory,
-        fileManager: FileManager = .default,
-        commandRunner: CommandRunner = CommandRunner()
+        fileManager: FileManager = .default
     ) {
         self.homeDirectory = homeDirectory
         self.fileManager = fileManager
-        self.commandRunner = commandRunner
     }
 
     func locations() async -> [StorageLocation] {
         await scan().locations
     }
 
-    func scan(permissionPromptTimeout: TimeInterval = 3) async -> WeChatDataScan {
+    func scan() async -> WeChatDataScan {
         var locations: [StorageLocation] = []
         let containerRoot = homeDirectory.appending(
             path: "Library/Containers/com.tencent.xinWeChat/Data"
@@ -43,7 +40,7 @@ actor WeChatDataLocator {
         )
 
         let directoryScan = hasModernRoot
-            ? await accountDirectories(in: modernRoot, timeout: permissionPromptTimeout)
+            ? accountDirectories(in: modernRoot)
             : (urls: [], succeeded: false)
         let accountURLs = directoryScan.urls
         accountURLs.forEach { accountURL in
@@ -140,25 +137,17 @@ actor WeChatDataLocator {
         await locations().filter(\.isCache).map(\.url)
     }
 
-    private func accountDirectories(
-        in root: URL,
-        timeout: TimeInterval
-    ) async -> (urls: [URL], succeeded: Bool) {
-        guard let result = try? await commandRunner.run(
-            executableURL: URL(fileURLWithPath: "/bin/ls"),
-            arguments: ["-1A", root.path],
-            timeout: timeout
-        ), result.terminationStatus == 0 else {
+    private func accountDirectories(in root: URL) -> (urls: [URL], succeeded: Bool) {
+        guard let urls = try? fileManager.contentsOfDirectory(
+            at: root,
+            includingPropertiesForKeys: [.isDirectoryKey],
+            options: [.skipsHiddenFiles]
+        ) else {
             return ([], false)
         }
 
-        let names = result.standardOutput.split(whereSeparator: \.isNewline).map(String.init)
-        let urls = names.compactMap { name -> URL? in
-            guard !name.hasPrefix(".") else { return nil }
-            let url = root.appending(path: name, directoryHint: .isDirectory)
-            var isDirectory: ObjCBool = false
-            guard fileManager.fileExists(atPath: url.path, isDirectory: &isDirectory),
-                  isDirectory.boolValue else {
+        let accountURLs = urls.compactMap { url -> URL? in
+            guard (try? url.resourceValues(forKeys: [.isDirectoryKey]).isDirectory) == true else {
                 return nil
             }
             return fileManager.fileExists(atPath: url.appending(path: "msg").path)
@@ -167,7 +156,7 @@ actor WeChatDataLocator {
                 : nil
         }
         .sorted { $0.lastPathComponent.localizedStandardCompare($1.lastPathComponent) == .orderedAscending }
-        return (urls, true)
+        return (accountURLs, true)
     }
 
     private func cacheCandidates(containerRoot: URL) -> [URL] {

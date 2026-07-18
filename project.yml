@@ -41,6 +41,9 @@ targets:
         LD_RUNPATH_SEARCH_PATHS:
           - "$(inherited)"
           - "@executable_path/../Frameworks"
+      configs:
+        Debug:
+          PRODUCT_BUNDLE_IDENTIFIER: com.makerjackie.WeChatManager.debug
   WeChatManagerTests:
     type: bundle.unit-test
     platform: macOS
