@@ -34,6 +34,16 @@ struct SettingsView: View {
                     .foregroundStyle(.secondary)
                 Text("缓存清理只会把明确选择的缓存目录移入废纸篓，不会静默永久删除。")
                     .foregroundStyle(.secondary)
+                Button(
+                    "查看权限说明与引导",
+                    systemImage: "hand.raised.fill",
+                    action: model.showPermissionGuide
+                )
+                Button(
+                    "打开“应用管理”设置",
+                    systemImage: "gearshape.2",
+                    action: model.openAppManagementSettings
+                )
             }
 
             Section("使用边界") {

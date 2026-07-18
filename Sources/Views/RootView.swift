@@ -4,12 +4,17 @@ struct RootView: View {
     @Environment(AppModel.self) private var model
 
     var body: some View {
+        @Bindable var model = model
         NavigationSplitView {
             SidebarView()
         } detail: {
             DestinationView(page: model.selectedPage ?? .overview)
         }
         .task(model.start)
+        .sheet(isPresented: $model.showsPermissionGuide) {
+            PermissionGuideView()
+                .environment(model)
+        }
         .alert(item: alertBinding) { message in
             Alert(
                 title: Text(message.title),

@@ -28,8 +28,10 @@ final class WeChatDataLocatorTests: XCTestCase {
             )
         }
 
-        let locations = await WeChatDataLocator(homeDirectory: temporaryHome).locations()
+        let scan = await WeChatDataLocator(homeDirectory: temporaryHome).scan()
+        let locations = scan.locations
 
+        XCTAssertEqual(scan.accessState, .available)
         XCTAssertTrue(locations.contains { $0.category == .root })
         XCTAssertTrue(locations.contains { $0.category == .account })
         XCTAssertTrue(locations.contains { $0.category == .files })
@@ -43,7 +45,8 @@ final class WeChatDataLocatorTests: XCTestCase {
     }
 
     func testDoesNotInventMissingLocations() async {
-        let locations = await WeChatDataLocator(homeDirectory: temporaryHome).locations()
-        XCTAssertTrue(locations.isEmpty)
+        let scan = await WeChatDataLocator(homeDirectory: temporaryHome).scan()
+        XCTAssertTrue(scan.locations.isEmpty)
+        XCTAssertEqual(scan.accessState, .notFound)
     }
 }

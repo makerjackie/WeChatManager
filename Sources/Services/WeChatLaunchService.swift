@@ -5,29 +5,43 @@ import Foundation
 struct WeChatLaunchService {
     private let workspace = NSWorkspace.shared
 
-    func installation() async -> WeChatInstallation? {
+    func applicationURL() -> URL? {
         let locatedURL = workspace.urlForApplication(
             withBundleIdentifier: AppConstants.weChatBundleIdentifier
         )
         let fallbackURL = URL(fileURLWithPath: "/Applications/WeChat.app", isDirectory: true)
         let applicationURL = locatedURL ?? fallbackURL
 
-        guard FileManager.default.fileExists(atPath: applicationURL.path),
-              let bundle = Bundle(url: applicationURL),
-              bundle.bundleIdentifier == AppConstants.weChatBundleIdentifier else {
-            return nil
-        }
+        return FileManager.default.fileExists(atPath: applicationURL.path)
+            ? applicationURL
+            : nil
+    }
 
-        let version = bundle.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "未知"
-        let build = bundle.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "未知"
-        let teamIdentifier = await Task.detached(priority: .userInitiated) {
-            CodeSignatureInspector().teamIdentifier(for: applicationURL)
+    func installation() async -> WeChatInstallation? {
+        guard let applicationURL = applicationURL() else { return nil }
+
+        let metadata = await Task.detached(priority: .userInitiated) {
+            guard let bundle = Bundle(url: applicationURL),
+                  bundle.bundleIdentifier == AppConstants.weChatBundleIdentifier else {
+                return nil as (version: String, build: String, teamIdentifier: String?)?
+            }
+            let version = bundle.object(
+                forInfoDictionaryKey: "CFBundleShortVersionString"
+            ) as? String ?? "未知"
+            let build = bundle.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "未知"
+            return (
+                version: version,
+                build: build,
+                teamIdentifier: CodeSignatureInspector().teamIdentifier(for: applicationURL)
+            )
         }.value
+        guard let metadata else { return nil }
+
         return WeChatInstallation(
             applicationURL: applicationURL,
-            version: version,
-            build: build,
-            teamIdentifier: teamIdentifier
+            version: metadata.version,
+            build: metadata.build,
+            teamIdentifier: metadata.teamIdentifier
         )
     }
 

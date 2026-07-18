@@ -24,6 +24,7 @@ final class AppModel {
     var showsCleanupConfirmation = false
     var showsInstallConfirmation = false
     var showsRestoreConfirmation = false
+    var showsPermissionGuide = false
 
     let updateController = UpdateController()
 
@@ -40,10 +41,16 @@ final class AppModel {
     @ObservationIgnored
     private let accountNameStore: AccountNameStore
     @ObservationIgnored
+    private let permissionGuideStore: PermissionGuideStore
+    @ObservationIgnored
     private var sizeScanTask: Task<Void, Never>?
 
-    init(accountNameStore: AccountNameStore = AccountNameStore()) {
+    init(
+        accountNameStore: AccountNameStore = AccountNameStore(),
+        permissionGuideStore: PermissionGuideStore = PermissionGuideStore()
+    ) {
         self.accountNameStore = accountNameStore
+        self.permissionGuideStore = permissionGuideStore
     }
 
     var visibleStorageAccountGroups: [StorageAccountGroup] {
@@ -94,14 +101,20 @@ final class AppModel {
     }
 
     func start() async {
+        guard !permissionGuideStore.shouldPresentGuide else {
+            showsPermissionGuide = true
+            return
+        }
         await refreshContent()
     }
 
     func refresh() {
+        guard ensurePermissionGuideCompleted() else { return }
         Task { await refreshContent() }
     }
 
     func launchOfficial() {
+        guard ensurePermissionGuideCompleted() else { return }
         Task {
             do {
                 try await launchService.launchOfficial()
@@ -114,6 +127,7 @@ final class AppModel {
     }
 
     func launchAdditionalInstance() {
+        guard ensurePermissionGuideCompleted() else { return }
         guard !isCreatingClone else { return }
         Task {
             do {
@@ -206,6 +220,7 @@ final class AppModel {
     }
 
     func requestEnhancementInstall() {
+        guard ensurePermissionGuideCompleted() else { return }
         showsInstallConfirmation = true
     }
 
@@ -222,6 +237,7 @@ final class AppModel {
     }
 
     func requestRestore() {
+        guard ensurePermissionGuideCompleted() else { return }
         showsRestoreConfirmation = true
     }
 
@@ -230,6 +246,7 @@ final class AppModel {
     }
 
     func createClone() {
+        guard ensurePermissionGuideCompleted() else { return }
         guard !isCreatingClone else { return }
         Task {
             guard let installation else {
@@ -313,6 +330,66 @@ final class AppModel {
         NSWorkspace.shared.open(AppConstants.upstreamRepositoryURL)
     }
 
+    func showPermissionGuide() {
+        showsPermissionGuide = true
+    }
+
+    func deferPermissionGuide() {
+        showsPermissionGuide = false
+    }
+
+    func completePermissionGuide() {
+        permissionGuideStore.markCompleted()
+        showsPermissionGuide = false
+        Task { await refreshContent() }
+    }
+
+    func requestWeChatApplicationAccess() async -> PermissionGuideResult {
+        guard launchService.applicationURL() != nil else {
+            return .unavailable("这台 Mac 尚未安装微信；安装后刷新即可继续。")
+        }
+        guard let checkedInstallation = await launchService.installation() else {
+            return .needsAction("系统尚未允许读取微信应用。请在系统提示中选择“允许”，然后重试。")
+        }
+
+        installation = checkedInstallation
+        let signatureDescription = checkedInstallation.isOfficiallySigned
+            ? "腾讯官方签名"
+            : "当前不是腾讯官方签名"
+        return .ready(
+            "已读取微信 \(checkedInstallation.version) 的版本与签名信息（\(signatureDescription)）。"
+        )
+    }
+
+    func requestWeChatDataAccess() async -> PermissionGuideResult {
+        let scan = await dataLocator.scan(permissionPromptTimeout: 45)
+        applyStorageLocations(scan.locations)
+
+        switch scan.accessState {
+        case .available:
+            let accountCount = Set(scan.locations.compactMap(\.accountIdentifier)).count
+            let detail = accountCount == 0
+                ? "权限已可用；当前尚未发现已登录的微信账号。"
+                : "权限已可用，已识别 \(accountCount) 个本机微信账号目录。"
+            return .ready(detail)
+        case .notFound:
+            return .unavailable("当前尚未生成微信文件目录；登录微信并收发一次文件后再刷新即可。")
+        case .unavailable:
+            return .needsAction("系统尚未允许读取微信文件。请在系统提示中选择“允许”，然后重试。")
+        }
+    }
+
+    func openAppManagementSettings() {
+        let workspace = NSWorkspace.shared
+        let privacySettingsURL = URL(
+            string: "x-apple.systempreferences:com.apple.settings.PrivacySecurity.extension?Privacy_AppBundles"
+        )
+        if let privacySettingsURL, workspace.open(privacySettingsURL) {
+            return
+        }
+        workspace.open(URL(fileURLWithPath: "/System/Applications/System Settings.app"))
+    }
+
     private func refreshContent() async {
         guard !isRefreshing else { return }
         isRefreshing = true
@@ -321,10 +398,7 @@ final class AppModel {
         installation = await launchService.installation()
         runningInstanceCount = launchService.runningInstanceCount()
         clones = await cloneService.clones()
-        storageLocations = await dataLocator.locations()
-        let accountIdentifiers = Array(Set(storageLocations.compactMap(\.accountIdentifier)))
-        accountAliases = accountNameStore.names(for: accountIdentifiers)
-        selectedCacheIDs.formIntersection(Set(storageLocations.filter(\.isCache).map(\.id)))
+        applyStorageLocations(await dataLocator.locations())
 
         guard let installation else {
             compatibility = .unavailable(reason: "没有找到微信，兼容增强不可用。")
@@ -378,7 +452,7 @@ final class AppModel {
             let cleaner = try CacheCleaner(allowedRoots: allowedCacheRoots)
             let result = try await cleaner.clean(urls: targets)
             selectedCacheIDs.removeAll()
-            storageLocations = await dataLocator.locations()
+            applyStorageLocations(await dataLocator.locations())
             message = UserMessage(
                 title: "缓存已移入废纸篓",
                 detail: "已处理 \(result.movedItemCount) 个目录，可从废纸篓恢复。"
@@ -452,5 +526,18 @@ final class AppModel {
         location.title.localizedStandardContains(storageSearchText)
             || location.detail.localizedStandardContains(storageSearchText)
             || location.url.path.localizedStandardContains(storageSearchText)
+    }
+
+    private func applyStorageLocations(_ locations: [StorageLocation]) {
+        storageLocations = locations
+        let accountIdentifiers = Array(Set(locations.compactMap(\.accountIdentifier)))
+        accountAliases = accountNameStore.names(for: accountIdentifiers)
+        selectedCacheIDs.formIntersection(Set(locations.filter(\.isCache).map(\.id)))
+    }
+
+    private func ensurePermissionGuideCompleted() -> Bool {
+        guard permissionGuideStore.shouldPresentGuide else { return true }
+        showsPermissionGuide = true
+        return false
     }
 }

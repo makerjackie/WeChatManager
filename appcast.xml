@@ -3,6 +3,50 @@
     <channel>
         <title>微信多开助手</title>
         <item>
+            <title>1.0.3</title>
+            <pubDate>Sat, 18 Jul 2026 11:33:37 +0800</pubDate>
+            <link>https://github.com/makerjackie/WeChatManager</link>
+            <sparkle:version>4</sparkle:version>
+            <sparkle:shortVersionString>1.0.3</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+            <description sparkle:format="markdown"><![CDATA[# 更新记录
+
+## 1.0.3 - 2026-07-18
+
+- 增加首次启动中文权限引导：先解释用途，再分别请求微信应用信息与微信文件访问权限。
+- 增加“应用管理”分步说明，明确系统会在首次实际创建、更新、移除分身或执行兼容增强时请求允许。
+- 说明管理员授权、分身摄像头、麦克风和通知权限的触发时机与使用边界。
+- 在设置页增加重新查看权限引导及直接打开“应用管理”设置的入口。
+- 优化系统权限用途文案，并补充权限状态与引导持久化测试。
+
+## 1.0.2 - 2026-07-18
+
+- 将新建微信分身安装到系统“应用程序”文件夹，避免微信提示从安装包直接打开；旧分身会在更新或下次启动时迁移。
+- 文件管理改为按微信账号分组，默认使用“微信号一、微信号二”等友好名称，并支持自定义命名。
+- 打开位置和复制路径改为直接按钮；完整数据路径默认收起。
+- 精简文件列表信息，账号标识不再直接出现在常规界面。
+- 补充 macOS 应用数据权限说明，并避免系统权限确认期间阻塞界面刷新。
+- 增加账号别名隐私、分身位置迁移及文件展示测试。
+
+## 1.0.1 - 2026-07-18
+
+- 改善微信启动逻辑对不同 Xcode 和 Swift 6 工具链的兼容性。
+- 更新 GitHub Actions 运行时，保持持续集成环境处于受支持版本。
+
+## 1.0.0 - 2026-07-18
+
+- 首个公开版本。
+- 提供原生 SwiftUI 中文界面、独立账号容器的微信分身与多实例管理。
+- 支持创建、启动、更新和安全移除分身，微信更新时保留分身登录数据。
+- 自动定位微信 4.x 与旧版文件、视频、账号和缓存目录。
+- 支持磁盘占用计算与移入废纸篓的安全缓存清理。
+- 提供按构建号严格匹配、完整备份、签名校验和恢复的兼容增强。
+- 集成 Sparkle 2 自动检查、下载、安装和重启更新。
+- 提供 Universal 2、Developer ID 签名、Apple 公证 DMG。
+]]></description>
+            <enclosure url="https://github.com/makerjackie/WeChatManager/releases/download/v1.0.3/WeChatManager.dmg" length="2157843" type="application/octet-stream" sparkle:edSignature="g9D3FYjcqniHZ/QNgLEk0GrpLgIM5bBAO060CoKHvXYcpivGOnZibuYBzA5w9H9Q0KT6hn5FRKqx2OMdw1FEDQ=="/>
+        </item>
+        <item>
             <title>1.0.2</title>
             <pubDate>Sat, 18 Jul 2026 11:03:37 +0800</pubDate>
             <link>https://github.com/makerjackie/WeChatManager</link>
@@ -64,28 +108,6 @@
 - 提供 Universal 2、Developer ID 签名、Apple 公证 DMG。
 ]]></description>
             <enclosure url="https://github.com/makerjackie/WeChatManager/releases/download/v1.0.1/WeChatManager.dmg" length="1968057" type="application/octet-stream" sparkle:edSignature="y2VayL6EnOI/lRhn5uJQKGzvJNejI1WYCZd3T6jWgYMr7tmBgTo/72LeJkLRVR0wKA4HhqbKigLJyo5/+SZPDw=="/>
-        </item>
-        <item>
-            <title>1.0.0</title>
-            <pubDate>Sat, 18 Jul 2026 09:31:21 +0800</pubDate>
-            <link>https://github.com/makerjackie/WeChatManager</link>
-            <sparkle:version>1</sparkle:version>
-            <sparkle:shortVersionString>1.0.0</sparkle:shortVersionString>
-            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
-            <description sparkle:format="markdown"><![CDATA[# 更新记录
-
-## 1.0.0 - 2026-07-18
-
-- 首个公开版本。
-- 提供原生 SwiftUI 中文界面、独立账号容器的微信分身与多实例管理。
-- 支持创建、启动、更新和安全移除分身，微信更新时保留分身登录数据。
-- 自动定位微信 4.x 与旧版文件、视频、账号和缓存目录。
-- 支持磁盘占用计算与移入废纸篓的安全缓存清理。
-- 提供按构建号严格匹配、完整备份、签名校验和恢复的兼容增强。
-- 集成 Sparkle 2 自动检查、下载、安装和重启更新。
-- 提供 Universal 2、Developer ID 签名、Apple 公证 DMG。
-]]></description>
-            <enclosure url="https://github.com/makerjackie/WeChatManager/releases/download/v1.0.0/WeChatManager.dmg" length="1971315" type="application/octet-stream" sparkle:edSignature="0c/IA+CYKazmyC89xGYbslrAXKBvyZfilvXaWfaK/QnU/DM0McxGr1gV4VYybXJTiqe7A5yXNqCnoo6PW00OCA=="/>
         </item>
     </channel>
 </rss>
