@@ -46,13 +46,9 @@ struct WeChatLaunchService {
             throw AppError(message: "要启动的微信应用不存在。")
         }
 
-        let configuration = NSWorkspace.OpenConfiguration()
-        configuration.activates = true
-        configuration.createsNewApplicationInstance = false
-        try await workspace.openApplication(
-            at: applicationURL,
-            configuration: configuration
-        )
+        guard workspace.open(applicationURL) else {
+            throw AppError(message: "微信启动失败，请稍后重试。")
+        }
     }
 
     func isRunning(bundleIdentifier: String) -> Bool {
