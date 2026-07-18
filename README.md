@@ -7,6 +7,15 @@
 >
 > **本项目即日起停止维护，不再适配后续微信版本。建议停止使用微信多开并改用官方客户端；如果仍要使用，请自行承担全部账号风险。**
 
+<details>
+<summary>查看微信官方风险提示截图（已脱敏）</summary>
+<br>
+<p align="center">
+  <img src="docs/assets/wechat-multiopen-risk-1.webp" width="320" alt="微信安全考试将多开插件认定为违规">
+  <img src="docs/assets/wechat-multiopen-risk-2.webp" width="320" alt="微信账号因分身多开或非官方客户端收到安全警告">
+</p>
+</details>
+
 开源的 macOS 微信多开与分身管理工具。
 
 ![微信多开助手：多开、分身方案、一键更新与 iCloud 同步](docs/assets/wechat-manager-hero.webp)
