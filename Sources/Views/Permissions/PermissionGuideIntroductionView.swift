@@ -12,7 +12,7 @@ struct PermissionGuideIntroductionView: View {
                 .foregroundStyle(Color.accentColor)
                 .accessibilityHidden(true)
 
-            Text("只需三步")
+            Text("只需两步")
                 .font(.title2)
                 .bold()
 

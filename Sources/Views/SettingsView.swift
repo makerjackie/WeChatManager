@@ -36,9 +36,8 @@ struct SettingsView: View {
                     InfoButton(
                         title: "隐私说明",
                         details: [
-                            "不会上传微信文件或聊天内容",
-                            "iCloud 只同步分身数量和名称",
-                            "清理的缓存可从废纸篓恢复"
+                            "不会读取或上传聊天内容",
+                            "iCloud 只同步分身数量和名称"
                         ]
                     )
                 }

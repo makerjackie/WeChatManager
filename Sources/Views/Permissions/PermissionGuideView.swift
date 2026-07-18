@@ -4,7 +4,6 @@ struct PermissionGuideView: View {
     @Environment(AppModel.self) private var model
     @State private var step = PermissionGuideStep.introduction
     @State private var applicationResult: PermissionGuideResult?
-    @State private var fileResult: PermissionGuideResult?
     @State private var isRequesting = false
 
     var body: some View {
@@ -17,7 +16,6 @@ struct PermissionGuideView: View {
                     title: "为什么需要权限",
                     details: [
                         "识别微信并创建分身",
-                        "帮你找到微信文件",
                         "权限可随时在系统设置中更改"
                     ]
                 )
@@ -55,23 +53,9 @@ struct PermissionGuideView: View {
                         backAction: showIntroduction,
                         nextAction: requestApplicationAccess
                     )
-                case .fileAccess:
-                    PermissionGuideAccessView(
-                        title: "允许访问微信文件",
-                        systemImage: "folder.badge.gearshape",
-                        infoTitle: "用于文件管理",
-                        infoDetails: [
-                            "帮你找到文件和视频",
-                            "不会读取或上传聊天内容"
-                        ],
-                        result: fileResult,
-                        isRequesting: isRequesting,
-                        backAction: showApplicationAccess,
-                        nextAction: requestFileAccess
-                    )
                 case .appManagement:
                     PermissionGuideAppManagementView(
-                        backAction: showFileAccess,
+                        backAction: showApplicationAccess,
                         completeAction: model.completePermissionGuide
                     )
                 }
@@ -89,18 +73,6 @@ struct PermissionGuideView: View {
             applicationResult = await model.requestWeChatApplicationAccess()
             isRequesting = false
             if applicationResult?.canContinue == true {
-                showFileAccess()
-            }
-        }
-    }
-
-    private func requestFileAccess() {
-        guard !isRequesting else { return }
-        isRequesting = true
-        Task {
-            fileResult = await model.requestWeChatDataAccess()
-            isRequesting = false
-            if fileResult?.canContinue == true {
                 showAppManagement()
             }
         }
@@ -112,10 +84,6 @@ struct PermissionGuideView: View {
 
     private func showApplicationAccess() {
         step = .applicationAccess
-    }
-
-    private func showFileAccess() {
-        step = .fileAccess
     }
 
     private func showAppManagement() {

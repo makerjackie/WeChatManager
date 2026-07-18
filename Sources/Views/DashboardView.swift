@@ -11,15 +11,14 @@ struct DashboardView: View {
                     infoTitle: "可以做什么",
                     infoDetails: [
                         "同时登录多个微信账号",
-                        "快速找到微信文件",
-                        "统一更新和恢复分身"
+                        "统一更新和恢复分身",
+                        "按需安装兼容增强"
                     ]
                 )
 
                 WeChatStatusCard()
                 CloneUpdateNotice()
                 QuickActionsView()
-                DashboardFileSummaryView()
             }
             .padding(DesignTokens.contentPadding)
             .frame(maxWidth: 920, alignment: .leading)

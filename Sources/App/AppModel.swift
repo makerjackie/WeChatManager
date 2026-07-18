@@ -8,25 +8,18 @@ final class AppModel {
     var selectedPage: NavigationPage? = .overview
     var installation: WeChatInstallation?
     var runningInstanceCount = 0
-    var storageLocations: [StorageLocation] = []
     var clones: [WeChatClone] = []
     var clonePlans: [ClonePlan] = []
-    var storageSearchText = ""
-    var accountAliases: [String: String] = [:]
-    var selectedCacheIDs = Set<String>()
     var isRefreshing = false
-    var isCalculatingSizes = false
     var isCreatingClone = false
     var isRunningCloneOperation = false
     var cloneOperationProgress = 0.0
     var cloneOperationDescription = ""
     var isPlanCloudAvailable = false
-    var sizeScanProgress = 0.0
     var compatibility: EnhancementCompatibility = .checking
     var selectedEnhancements: Set<EnhancementOption> = [.multiInstance]
     var hasEnhancementBackup = false
     var message: UserMessage?
-    var showsCleanupConfirmation = false
     var showsInstallConfirmation = false
     var showsRestoreConfirmation = false
     var showsPermissionGuide = false
@@ -37,74 +30,23 @@ final class AppModel {
     @ObservationIgnored
     private let launchService = WeChatLaunchService()
     @ObservationIgnored
-    private let dataLocator = WeChatDataLocator()
-    @ObservationIgnored
-    private let storageScanner = StorageScanner()
-    @ObservationIgnored
     private let cloneService = WeChatCloneService()
     @ObservationIgnored
     private let enhancementService = EnhancementService()
     @ObservationIgnored
-    private let accountNameStore: AccountNameStore
-    @ObservationIgnored
     private let permissionGuideStore: PermissionGuideStore
     @ObservationIgnored
     private let clonePlanStore: ClonePlanStore
-    @ObservationIgnored
-    private var sizeScanTask: Task<Void, Never>?
 
     init(
-        accountNameStore: AccountNameStore = AccountNameStore(),
         permissionGuideStore: PermissionGuideStore = PermissionGuideStore(),
         clonePlanStore: ClonePlanStore = ClonePlanStore()
     ) {
-        self.accountNameStore = accountNameStore
         self.permissionGuideStore = permissionGuideStore
         self.clonePlanStore = clonePlanStore
         clonePlanStore.onExternalChange = { [weak self] in
             self?.reloadClonePlans()
         }
-    }
-
-    var visibleStorageAccountGroups: [StorageAccountGroup] {
-        var seenIdentifiers = Set<String>()
-        let identifiers = storageLocations.compactMap(\.accountIdentifier).filter {
-            seenIdentifiers.insert($0).inserted
-        }
-
-        return identifiers.enumerated().compactMap { offset, identifier in
-            let defaultName = StorageAccountGroup.defaultName(for: offset + 1)
-            let displayName = accountAliases[identifier] ?? defaultName
-            let locations = storageLocations.filter { $0.accountIdentifier == identifier }
-            let visibleLocations: [StorageLocation]
-            if storageSearchText.isEmpty
-                || displayName.localizedStandardContains(storageSearchText) {
-                visibleLocations = locations
-            } else {
-                visibleLocations = locations.filter(matchesStorageSearch)
-            }
-            guard !visibleLocations.isEmpty else { return nil }
-            return StorageAccountGroup(
-                id: identifier,
-                displayName: displayName,
-                defaultName: defaultName,
-                locations: visibleLocations
-            )
-        }
-    }
-
-    var visibleAdditionalStorageLocations: [StorageLocation] {
-        let locations = storageLocations.filter { $0.accountIdentifier == nil }
-        guard !storageSearchText.isEmpty else { return locations }
-        return locations.filter(matchesStorageSearch)
-    }
-
-    var hasVisibleStorageLocations: Bool {
-        !visibleStorageAccountGroups.isEmpty || !visibleAdditionalStorageLocations.isEmpty
-    }
-
-    var selectedCacheCount: Int {
-        selectedCacheIDs.count
     }
 
     var outdatedClones: [WeChatClone] {
@@ -189,63 +131,6 @@ final class AppModel {
             try? await Task.sleep(for: .seconds(1))
             runningInstanceCount = launchService.runningInstanceCount()
         }
-    }
-
-    func calculateStorageSizes() {
-        guard !isCalculatingSizes else { return }
-        sizeScanTask?.cancel()
-        sizeScanTask = Task { await performSizeScan() }
-    }
-
-    func cancelStorageScan() {
-        sizeScanTask?.cancel()
-        sizeScanTask = nil
-        isCalculatingSizes = false
-    }
-
-    func toggleCacheSelection(_ location: StorageLocation) {
-        if selectedCacheIDs.contains(location.id) {
-            selectedCacheIDs.remove(location.id)
-        } else {
-            selectedCacheIDs.insert(location.id)
-        }
-    }
-
-    func requestCleanup() {
-        guard !selectedCacheIDs.isEmpty else {
-            message = UserMessage(title: "尚未选择缓存", detail: "请先选择要清理的缓存。")
-            return
-        }
-        showsCleanupConfirmation = true
-    }
-
-    func cleanSelectedCaches() {
-        Task { await performCleanup() }
-    }
-
-    func open(_ location: StorageLocation) {
-        NSWorkspace.shared.open(location.url)
-    }
-
-    func copyPath(of location: StorageLocation) {
-        NSPasteboard.general.clearContents()
-        NSPasteboard.general.setString(location.url.path, forType: .string)
-        message = UserMessage(title: "已复制路径", detail: location.url.path)
-    }
-
-    func renameAccount(identifier: String, name: String) {
-        let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmedName.isEmpty else {
-            message = UserMessage(title: "名称不能为空", detail: "请输入一个容易辨认的账号名称。")
-            return
-        }
-        accountAliases[identifier] = trimmedName
-        accountNameStore.setName(trimmedName, for: identifier)
-    }
-
-    func resetAccountName(identifier: String) {
-        accountAliases.removeValue(forKey: identifier)
-        accountNameStore.setName(nil, for: identifier)
     }
 
     func requestEnhancementInstall() {
@@ -461,24 +346,6 @@ final class AppModel {
         return .ready(detail)
     }
 
-    func requestWeChatDataAccess() async -> PermissionGuideResult {
-        let scan = await dataLocator.scan()
-        applyStorageLocations(scan.locations)
-
-        switch scan.accessState {
-        case .available:
-            let accountCount = Set(scan.locations.compactMap(\.accountIdentifier)).count
-            let detail = accountCount == 0
-                ? "权限已可用；当前尚未发现已登录的微信账号。"
-                : "权限已可用，已识别 \(accountCount) 个本机微信账号目录。"
-            return .ready(detail)
-        case .notFound:
-            return .unavailable("当前尚未生成微信文件目录；登录微信并收发一次文件后再刷新即可。")
-        case .unavailable:
-            return .needsAction("系统尚未允许读取微信文件。请在系统提示中选择“允许”，然后重试。")
-        }
-    }
-
     func openAppManagementSettings() {
         let workspace = NSWorkspace.shared
         let privacySettingsURL = URL(
@@ -498,7 +365,6 @@ final class AppModel {
         installation = await launchService.installation()
         runningInstanceCount = launchService.runningInstanceCount()
         clones = await cloneService.clones()
-        applyStorageLocations(await dataLocator.locations())
 
         guard let installation else {
             compatibility = .unavailable(reason: "没有找到微信。", supportedBuilds: [])
@@ -645,57 +511,6 @@ final class AppModel {
         )
     }
 
-    private func performSizeScan() async {
-        isCalculatingSizes = true
-        sizeScanProgress = 0
-        defer {
-            isCalculatingSizes = false
-            sizeScanTask = nil
-        }
-
-        let locations = storageLocations
-        guard !locations.isEmpty else { return }
-        for (index, location) in locations.enumerated() {
-            guard !Task.isCancelled else { return }
-            do {
-                let size = try await storageScanner.allocatedSize(of: location.url)
-                if let currentIndex = storageLocations.firstIndex(where: { $0.id == location.id }) {
-                    storageLocations[currentIndex] = location.withAllocatedSize(size)
-                }
-            } catch is CancellationError {
-                return
-            } catch {
-                continue
-            }
-            sizeScanProgress = Double(index + 1) / Double(locations.count)
-        }
-    }
-
-    private func performCleanup() async {
-        runningInstanceCount = launchService.runningInstanceCount()
-        guard runningInstanceCount == 0 else {
-            message = UserMessage(title: "请先退出微信", detail: "为避免缓存仍在写入，请退出全部微信实例后再清理。")
-            return
-        }
-
-        let targets = storageLocations
-            .filter { selectedCacheIDs.contains($0.id) && $0.isCache }
-            .map(\.url)
-        do {
-            let allowedCacheRoots = await dataLocator.allowedCacheRoots()
-            let cleaner = try CacheCleaner(allowedRoots: allowedCacheRoots)
-            let result = try await cleaner.clean(urls: targets)
-            selectedCacheIDs.removeAll()
-            applyStorageLocations(await dataLocator.locations())
-            message = UserMessage(
-                title: "缓存已移入废纸篓",
-                detail: "已处理 \(result.movedItemCount) 个目录，可从废纸篓恢复。"
-            )
-        } catch {
-            present(error: error, title: "缓存清理失败")
-        }
-    }
-
     private func performEnhancementInstall() async {
         guard let installation else {
             message = UserMessage(title: "没有找到微信", detail: "请先安装微信。")
@@ -754,19 +569,6 @@ final class AppModel {
             detail: "已修复微信的安装位置提示，账号登录数据保持不变。"
         )
         return migratedClone
-    }
-
-    private func matchesStorageSearch(_ location: StorageLocation) -> Bool {
-        location.title.localizedStandardContains(storageSearchText)
-            || location.detail.localizedStandardContains(storageSearchText)
-            || location.url.path.localizedStandardContains(storageSearchText)
-    }
-
-    private func applyStorageLocations(_ locations: [StorageLocation]) {
-        storageLocations = locations
-        let accountIdentifiers = Array(Set(locations.compactMap(\.accountIdentifier)))
-        accountAliases = accountNameStore.names(for: accountIdentifiers)
-        selectedCacheIDs.formIntersection(Set(locations.filter(\.isCache).map(\.id)))
     }
 
     private func ensurePermissionGuideCompleted() -> Bool {

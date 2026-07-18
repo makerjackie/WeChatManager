@@ -11,8 +11,6 @@ struct DestinationView: View {
             InstancesView()
         case .plans:
             PlansView()
-        case .files:
-            FileManagerView()
         case .enhancements:
             EnhancementsView()
         case .settings:
