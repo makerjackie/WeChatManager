@@ -19,10 +19,12 @@ struct ManagedCloneRow: View {
                     Text(model.isRunning(clone) ? "运行中" : "未运行")
                         .foregroundStyle(model.isRunning(clone) ? .green : .secondary)
                 }
-                Text("来源：微信 \(clone.sourceVersion)（\(clone.sourceBuild)）")
+                Text("微信 \(clone.sourceVersion)")
                     .foregroundStyle(.secondary)
-                Text(clone.isInstalledInApplicationsFolder ? "位置：应用程序" : "旧版位置：下次启动时自动迁移")
-                    .foregroundStyle(locationColor)
+                if !clone.isInstalledInApplicationsFolder {
+                    Label("需要修复位置", systemImage: "exclamationmark.triangle.fill")
+                        .foregroundStyle(.orange)
+                }
             }
 
             Spacer()
@@ -51,7 +53,7 @@ struct ManagedCloneRow: View {
             Button("移入废纸篓", role: .destructive, action: deleteClone)
             Button("取消", role: .cancel) { }
         } message: {
-            Text("只移动分身应用，不删除独立的微信账号容器数据。")
+            Text("分身会移入废纸篓，聊天数据会保留。")
         }
     }
 
@@ -61,11 +63,7 @@ struct ManagedCloneRow: View {
     }
 
     private var updateButtonTitle: String {
-        clone.isInstalledInApplicationsFolder ? "更新分身" : "修复位置"
-    }
-
-    private var locationColor: Color {
-        clone.isInstalledInApplicationsFolder ? .secondary : .orange
+        clone.isInstalledInApplicationsFolder ? "更新" : "修复"
     }
 
     private func launchClone() {

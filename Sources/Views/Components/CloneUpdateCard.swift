@@ -6,40 +6,40 @@ struct CloneUpdateCard: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: DesignTokens.standardSpacing) {
-            Label("分身版本", systemImage: statusImage)
+            Label("分身更新", systemImage: statusImage)
                 .font(.title2)
                 .bold()
 
             if let installation = model.installation {
                 if model.clones.isEmpty {
-                    Text("当前官方微信为 \(installation.version)，创建分身后可在这里统一更新。")
+                    Text("微信 \(installation.version) 已就绪。")
                         .foregroundStyle(.secondary)
                 } else if model.outdatedClones.isEmpty {
-                    Text("全部 \(model.clones.count) 个分身都与官方微信 \(installation.version) 一致。")
+                    Text("\(model.clones.count) 个分身都是最新版本。")
                         .foregroundStyle(.secondary)
                 } else {
-                    Text("检测到官方微信为 \(installation.version)，有 \(model.outdatedClones.count) 个分身需要同步。")
-                    Text("更新只替换分身应用代码，Bundle ID 和独立账号容器保持不变。")
+                    Text("有 \(model.outdatedClones.count) 个分身可更新到微信 \(installation.version)。")
+                    Text("更新后保留登录状态和聊天数据。")
                         .foregroundStyle(.secondary)
 
-                    Button("一键更新全部分身", systemImage: "arrow.triangle.2.circlepath") {
+                    Button("全部更新", systemImage: "arrow.triangle.2.circlepath") {
                         showsUpdateConfirmation = true
                     }
                     .buttonStyle(.borderedProminent)
                     .disabled(model.isRunningCloneOperation)
                     .confirmationDialog(
-                        "将全部分身同步到微信 \(installation.version)？",
+                        "更新 \(model.outdatedClones.count) 个分身？",
                         isPresented: $showsUpdateConfirmation,
                         titleVisibility: .visible
                     ) {
                         Button("开始更新", action: model.updateAllClones)
                         Button("取消", role: .cancel) { }
                     } message: {
-                        Text("请先退出待更新的分身。旧应用会移入废纸篓，登录状态和聊天数据容器不会删除。")
+                        Text("请先退出这些分身。旧版本会移入废纸篓。")
                     }
                 }
             } else {
-                Text("没有找到官方微信，请先安装到“应用程序”文件夹。")
+                Text("没有找到微信，请先安装微信。")
                     .foregroundStyle(.secondary)
             }
         }

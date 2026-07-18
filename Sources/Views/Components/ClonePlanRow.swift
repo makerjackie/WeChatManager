@@ -39,7 +39,7 @@ struct ClonePlanRow: View {
                 }
                 Button("取消", role: .cancel) { }
             } message: {
-                Text("将创建缺少的分身并更新版本或名称不同的分身；不会删除方案外的分身。")
+                Text("会创建或更新方案中的分身，其他分身不受影响。")
             }
 
             Button("删除方案", systemImage: "trash", role: .destructive) {
@@ -56,7 +56,7 @@ struct ClonePlanRow: View {
                 }
                 Button("取消", role: .cancel) { }
             } message: {
-                Text("只删除方案记录，不会删除任何微信分身或账号数据。")
+                Text("只删除方案，不会删除分身。")
             }
         }
         .appCard()

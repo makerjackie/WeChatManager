@@ -10,7 +10,7 @@ struct InstancesView: View {
                     Text("分身管理")
                         .font(.largeTitle)
                         .bold()
-                    Text("每个分身拥有独立的 Bundle ID 和微信数据容器，可分别登录不同账号。")
+                    Text("每个分身可登录一个微信账号。")
                         .font(.title3)
                         .foregroundStyle(.secondary)
                 }
@@ -23,7 +23,7 @@ struct InstancesView: View {
                     ContentUnavailableView(
                         "还没有微信分身",
                         systemImage: "square.on.square.dashed",
-                        description: Text("创建第一个分身后，即可同时登录另一个微信账号。")
+                        description: Text("创建分身，登录另一个账号。")
                     )
                     .appCard()
                 } else {
@@ -52,7 +52,7 @@ struct InstancesView: View {
         }
         .overlay {
             if model.isCreatingClone {
-                ProgressView("正在复制并签名微信，请稍候…")
+                ProgressView("正在创建分身…")
                     .padding(DesignTokens.roomySpacing)
                     .background(.regularMaterial)
                     .clipShape(.rect(cornerRadius: DesignTokens.cardCornerRadius))

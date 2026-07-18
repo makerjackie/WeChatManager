@@ -11,7 +11,7 @@ struct EnhancementsView: View {
                     Text("兼容增强")
                         .font(.largeTitle)
                         .bold()
-                    Text("仅在构建号精确匹配时修改微信，并在修改前保存完整的官方备份。")
+                    Text("修改前自动备份，仅支持已适配的微信版本。")
                         .font(.title3)
                         .foregroundStyle(.secondary)
                 }
@@ -32,17 +32,17 @@ struct EnhancementsView: View {
             Button("创建备份并安装", action: model.installEnhancements)
             Button("取消", role: .cancel) { }
         } message: {
-            Text("操作需要管理员密码，会修改微信并将其改为本机临时签名。微信升级后可能需要重新安装增强。")
+            Text("需要管理员授权，安装前会自动备份微信。")
         }
         .confirmationDialog(
-            "恢复官方微信备份？",
+            "恢复微信备份？",
             isPresented: $model.showsRestoreConfirmation,
             titleVisibility: .visible
         ) {
             Button("恢复备份", action: model.restoreOfficialWeChat)
             Button("取消", role: .cancel) { }
         } message: {
-            Text("当前微信应用将被已校验的腾讯官方签名备份替换，不会触碰聊天数据。")
+            Text("将恢复之前保存的微信，不影响聊天数据。")
         }
     }
 }

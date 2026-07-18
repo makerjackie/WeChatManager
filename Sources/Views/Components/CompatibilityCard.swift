@@ -15,7 +15,7 @@ struct CompatibilityCard: View {
                     .font(.headline)
                 Text(model.compatibility.summary)
                 if let installation = model.installation {
-                    Text("微信 \(installation.version) · 构建号 \(installation.build)")
+                    Text("微信 \(installation.version)")
                         .foregroundStyle(.secondary)
                 }
             }

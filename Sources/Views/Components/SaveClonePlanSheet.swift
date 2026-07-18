@@ -18,7 +18,7 @@ struct SaveClonePlanSheet: View {
                 Text("保存当前方案")
                     .font(.title2)
                     .bold()
-                Text("方案只记录如何重建分身，不备份聊天和登录数据。")
+                Text("保存分身数量和名称。")
                     .foregroundStyle(.secondary)
             }
 

@@ -11,7 +11,7 @@ struct PlansView: View {
                     Text("方案与更新")
                         .font(.largeTitle)
                         .bold()
-                    Text("官方微信更新后，一次同步全部分身；换 Mac 时可从 iCloud 恢复分身配置。")
+                    Text("更新全部分身，也可在新 Mac 恢复。")
                         .font(.title3)
                         .foregroundStyle(.secondary)
                 }
@@ -23,7 +23,7 @@ struct PlansView: View {
                     ContentUnavailableView(
                         "还没有保存方案",
                         systemImage: "square.stack.3d.up.slash",
-                        description: Text("先创建并登录常用分身，再保存当前方案。")
+                        description: Text("保存常用分身，换 Mac 时快速恢复。")
                     )
                     .appCard()
                 } else {
@@ -44,7 +44,7 @@ struct PlansView: View {
                     model.showsSavePlanSheet = true
                 }
                 .disabled(model.clones.isEmpty || model.isRunningCloneOperation)
-                Button("从 iCloud 刷新", systemImage: "icloud.and.arrow.down", action: model.refreshClonePlans)
+                Button("刷新方案", systemImage: "icloud.and.arrow.down", action: model.refreshClonePlans)
                     .disabled(model.isRunningCloneOperation)
             }
         }

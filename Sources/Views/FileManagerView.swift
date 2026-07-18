@@ -60,7 +60,7 @@ struct FileManagerView: View {
             Button("移入废纸篓", role: .destructive, action: model.cleanSelectedCaches)
             Button("取消", role: .cancel) { }
         } message: {
-            Text("不会删除聊天记录、收到的文件或视频。关闭微信后执行，缓存仍可从废纸篓恢复。")
+            Text("只清理缓存，可从废纸篓恢复。")
         }
         .sheet(item: $editingAccount) { group in
             AccountRenameSheet(

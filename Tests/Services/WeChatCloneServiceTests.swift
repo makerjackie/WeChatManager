@@ -77,6 +77,74 @@ final class WeChatCloneServiceTests: XCTestCase {
         XCTAssertNil(plist?["CFBundleURLTypes"])
     }
 
+    func testCreatesCloneFromModifiedWeChatWithoutOfficialSignature() async throws {
+        let root = FileManager.default.temporaryDirectory.appending(
+            path: "WeChatCloneModifiedSourceTests-\(UUID().uuidString)"
+        )
+        defer { try? FileManager.default.removeItem(at: root) }
+        let home = root.appending(path: "home")
+        let source = root.appending(path: "WeChat.app")
+        try FileManager.default.createDirectory(at: home, withIntermediateDirectories: true)
+        try writeRunnableApplication(at: source)
+        let installation = WeChatInstallation(
+            applicationURL: source,
+            version: "4.1.11",
+            build: "269110",
+            teamIdentifier: nil
+        )
+        let service = WeChatCloneService(
+            homeDirectory: home,
+            managedApplicationsDirectory: home.appending(path: "Applications")
+        )
+
+        let clone = try await service.createNext(from: installation)
+
+        XCTAssertEqual(clone.sourceBuild, "269110")
+        XCTAssertEqual(clone.bundleIdentifier, "com.makerjackie.WeChatManager.clone.1")
+        XCTAssertTrue(FileManager.default.fileExists(atPath: clone.applicationURL.path))
+    }
+
+    func testRejectsNonWeChatApplication() async throws {
+        let root = FileManager.default.temporaryDirectory.appending(
+            path: "WeChatCloneInvalidSourceTests-\(UUID().uuidString)"
+        )
+        defer { try? FileManager.default.removeItem(at: root) }
+        let home = root.appending(path: "home")
+        let source = root.appending(path: "Other.app")
+        try FileManager.default.createDirectory(at: home, withIntermediateDirectories: true)
+        try writeRunnableApplication(at: source)
+        let plistURL = source.appending(path: "Contents/Info.plist")
+        let data = try Data(contentsOf: plistURL)
+        var plist = try XCTUnwrap(
+            PropertyListSerialization.propertyList(from: data, options: [], format: nil)
+                as? [String: Any]
+        )
+        plist["CFBundleIdentifier"] = "example.other"
+        let invalidData = try PropertyListSerialization.data(
+            fromPropertyList: plist,
+            format: .xml,
+            options: 0
+        )
+        try invalidData.write(to: plistURL)
+        let installation = WeChatInstallation(
+            applicationURL: source,
+            version: "1.0",
+            build: "1",
+            teamIdentifier: nil
+        )
+        let service = WeChatCloneService(
+            homeDirectory: home,
+            managedApplicationsDirectory: home.appending(path: "Applications")
+        )
+
+        do {
+            _ = try await service.createNext(from: installation)
+            XCTFail("非微信应用不应被创建为分身")
+        } catch {
+            XCTAssertEqual(error.localizedDescription, "当前应用不是可识别的微信。")
+        }
+    }
+
     func testUpdatingLegacyCloneMovesItIntoManagedApplicationsDirectory() async throws {
         let root = FileManager.default.temporaryDirectory.appending(
             path: "WeChatCloneMigrationTests-\(UUID().uuidString)"

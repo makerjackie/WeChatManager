@@ -7,10 +7,10 @@ struct DashboardView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: DesignTokens.roomySpacing) {
                 VStack(alignment: .leading, spacing: DesignTokens.compactSpacing) {
-                    Text("微信，一目了然")
+                    Text("微信多开助手")
                         .font(.largeTitle)
                         .bold()
-                    Text("多开、文件定位、缓存管理和版本增强都集中在这里。")
+                    Text("多开、文件和更新，都在这里。")
                         .font(.title3)
                         .foregroundStyle(.secondary)
                 }

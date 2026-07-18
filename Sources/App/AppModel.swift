@@ -138,7 +138,7 @@ final class AppModel {
         reloadClonePlans()
         message = UserMessage(
             title: "方案已刷新",
-            detail: isPlanCloudAvailable ? "已读取本机与 iCloud 中的最新方案。" : "当前仅能读取本机方案。"
+            detail: isPlanCloudAvailable ? "已读取最新方案。" : "已读取本机方案。"
         )
     }
 
@@ -168,7 +168,7 @@ final class AppModel {
                     try await launchService.launch(applicationURL: preparedClone.applicationURL)
                 } else {
                     guard let installation else {
-                        throw AppError(message: "请先安装官方微信。")
+                        throw AppError(message: "请先安装微信。")
                     }
                     isCreatingClone = true
                     defer { isCreatingClone = false }
@@ -279,14 +279,17 @@ final class AppModel {
         guard !isCreatingClone else { return }
         Task {
             guard let installation else {
-                message = UserMessage(title: "没有找到微信", detail: "请先安装官方微信。")
+                message = UserMessage(title: "没有找到微信", detail: "请先安装微信。")
                 return
             }
             isCreatingClone = true
             defer { isCreatingClone = false }
             do {
                 let clone = try await cloneService.createNext(from: installation)
-                message = UserMessage(title: "分身已创建", detail: "已创建 \(clone.displayName)，登录后即可独立使用。")
+                let detail = installation.isOfficiallySigned
+                    ? "\(clone.displayName) 已创建。"
+                    : "\(clone.displayName) 已按当前微信创建。"
+                message = UserMessage(title: "分身已创建", detail: detail)
                 await refreshContent()
             } catch {
                 present(error: error, title: "创建分身失败")
@@ -314,7 +317,7 @@ final class AppModel {
             return false
         }
         guard let installation else {
-            message = UserMessage(title: "没有找到微信", detail: "请先安装官方微信。")
+            message = UserMessage(title: "没有找到微信", detail: "请先安装微信。")
             return false
         }
 
@@ -339,8 +342,8 @@ final class AppModel {
         message = UserMessage(
             title: existingPlan == nil ? "方案已保存" : "方案已更新",
             detail: isPlanCloudAvailable
-                ? "“\(normalizedName)”已保存并提交到 iCloud，同 Apple ID 的 Mac 可恢复。"
-                : "“\(normalizedName)”已保存在本机；iCloud 当前不可用。"
+                ? "“\(normalizedName)”已同步到 iCloud。"
+                : "“\(normalizedName)”已保存在本机。"
         )
         return true
     }
@@ -350,7 +353,7 @@ final class AppModel {
         isPlanCloudAvailable = clonePlanStore.save(clonePlans)
         message = UserMessage(
             title: "方案已删除",
-            detail: "只删除方案记录，不影响已经安装的微信分身及账号数据。"
+            detail: "已安装的分身不受影响。"
         )
     }
 
@@ -393,7 +396,7 @@ final class AppModel {
             defer { isCreatingClone = false }
             do {
                 _ = try await cloneService.update(clone, from: installation)
-                message = UserMessage(title: "分身已更新", detail: "登录数据保留，应用代码已更新到微信 \(installation.version)。")
+                message = UserMessage(title: "分身已更新", detail: "已更新到微信 \(installation.version)，登录数据保留。")
                 await refreshContent()
             } catch {
                 present(error: error, title: "更新分身失败")
@@ -409,7 +412,7 @@ final class AppModel {
             }
             do {
                 _ = try await cloneService.moveToTrash(clone)
-                message = UserMessage(title: "分身已移入废纸篓", detail: "账号容器数据没有删除，可从废纸篓恢复应用。")
+                message = UserMessage(title: "分身已移入废纸篓", detail: "聊天数据已保留。")
                 await refreshContent()
             } catch {
                 present(error: error, title: "无法移除分身")
@@ -452,12 +455,10 @@ final class AppModel {
         }
 
         installation = checkedInstallation
-        let signatureDescription = checkedInstallation.isOfficiallySigned
-            ? "腾讯官方签名"
-            : "当前不是腾讯官方签名"
-        return .ready(
-            "已读取微信 \(checkedInstallation.version) 的版本与签名信息（\(signatureDescription)）。"
-        )
+        let detail = checkedInstallation.isOfficiallySigned
+            ? "微信 \(checkedInstallation.version) 已就绪。"
+            : "微信 \(checkedInstallation.version) 已就绪，当前版本已被其他工具修改。"
+        return .ready(detail)
     }
 
     func requestWeChatDataAccess() async -> PermissionGuideResult {
@@ -512,12 +513,12 @@ final class AppModel {
 
     private func performUpdateAllClones() async {
         guard let installation else {
-            message = UserMessage(title: "没有找到微信", detail: "请先安装官方微信。")
+            message = UserMessage(title: "没有找到微信", detail: "请先安装微信。")
             return
         }
         let targets = outdatedClones.sorted { $0.index < $1.index }
         guard !targets.isEmpty else {
-            message = UserMessage(title: "已经是最新版本", detail: "所有分身都与官方微信版本一致。")
+            message = UserMessage(title: "已经是最新版本", detail: "所有分身都是最新版本。")
             return
         }
         let runningTargets = targets.filter { launchService.isRunning(bundleIdentifier: $0.bundleIdentifier) }
@@ -556,13 +557,13 @@ final class AppModel {
         await refreshContent()
         message = UserMessage(
             title: "全部分身已更新",
-            detail: "已同步到微信 \(installation.version)，登录状态和独立账号容器保持不变。"
+            detail: "已更新到微信 \(installation.version)，登录数据保留。"
         )
     }
 
     private func performApplyClonePlan(_ plan: ClonePlan) async {
         guard let installation else {
-            message = UserMessage(title: "没有找到微信", detail: "请先安装官方微信。")
+            message = UserMessage(title: "没有找到微信", detail: "请先安装微信。")
             return
         }
         let items = Array(
@@ -640,7 +641,7 @@ final class AppModel {
         await refreshContent()
         message = UserMessage(
             title: "方案已应用",
-            detail: "新建 \(createdCount) 个、更新 \(updatedCount) 个分身；方案外的分身没有删除。新设备上的账号需要重新扫码登录。"
+            detail: "已创建 \(createdCount) 个、更新 \(updatedCount) 个；其他分身不受影响。新 Mac 上需要重新登录。"
         )
     }
 
@@ -697,7 +698,7 @@ final class AppModel {
 
     private func performEnhancementInstall() async {
         guard let installation else {
-            message = UserMessage(title: "没有找到微信", detail: "请先安装官方微信。")
+            message = UserMessage(title: "没有找到微信", detail: "请先安装微信。")
             return
         }
         runningInstanceCount = launchService.runningInstanceCount()
@@ -745,7 +746,7 @@ final class AppModel {
             throw AppError(message: "请先退出旧版分身，再打开一次以完成位置迁移。")
         }
         guard let installation else {
-            throw AppError(message: "请先安装官方微信，才能迁移旧版分身。")
+            throw AppError(message: "请先安装微信，才能修复分身。")
         }
         let migratedClone = try await cloneService.update(clone, from: installation)
         message = UserMessage(

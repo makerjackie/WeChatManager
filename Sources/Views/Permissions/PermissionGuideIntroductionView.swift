@@ -6,10 +6,10 @@ struct PermissionGuideIntroductionView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: DesignTokens.roomySpacing) {
             VStack(alignment: .leading, spacing: DesignTokens.compactSpacing) {
-                Label("先说明，再请求", systemImage: "hand.raised.fill")
+                Label("只请求必要权限", systemImage: "hand.raised.fill")
                     .font(.title2)
                     .bold()
-                Text("微信多开助手只请求完成功能所需的权限。所有授权都由 macOS 管理，你可以拒绝，也可以稍后重新查看本引导。")
+                Text("授权由 macOS 管理，可随时更改。")
                     .foregroundStyle(.secondary)
             }
 
@@ -20,7 +20,7 @@ struct PermissionGuideIntroductionView: View {
             }
 
             Label(
-                "应用不会获取微信密码、登录令牌，也不会连接、扫描或控制腾讯服务器。",
+                "不读取微信密码或聊天内容。",
                 systemImage: "lock.shield.fill"
             )
             .foregroundStyle(.secondary)
@@ -29,7 +29,7 @@ struct PermissionGuideIntroductionView: View {
 
             HStack {
                 Spacer()
-                Button("开始权限引导", systemImage: "arrow.right", action: continueAction)
+                Button("开始", systemImage: "arrow.right", action: continueAction)
                     .buttonStyle(.borderedProminent)
             }
         }

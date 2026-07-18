@@ -6,14 +6,14 @@ struct OfficialInstanceCard: View {
 
     var body: some View {
         HStack(spacing: DesignTokens.standardSpacing) {
-            Image(systemName: "checkmark.seal.fill")
+            Image(systemName: installation.isOfficiallySigned ? "checkmark.seal.fill" : "pencil.and.outline")
                 .font(.title)
-                .foregroundStyle(.green)
+                .foregroundStyle(installation.isOfficiallySigned ? Color.green : Color.orange)
                 .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: DesignTokens.compactSpacing) {
-                Text("官方微信")
+                Text("当前微信")
                     .font(.headline)
-                Text("版本 \(installation.version)（\(installation.build)）· 腾讯官方签名")
+                Text("版本 \(installation.version) · \(versionDescription)")
                     .foregroundStyle(.secondary)
             }
             Spacer()
@@ -21,5 +21,9 @@ struct OfficialInstanceCard: View {
                 .buttonStyle(.borderedProminent)
         }
         .appCard()
+    }
+
+    private var versionDescription: String {
+        installation.isOfficiallySigned ? "腾讯官方版本" : "已被其他工具修改"
     }
 }

@@ -27,7 +27,7 @@ struct PermissionGuideAccessView: View {
                 .background(.quaternary, in: RoundedRectangle(cornerRadius: DesignTokens.cardCornerRadius))
 
             VStack(alignment: .leading, spacing: DesignTokens.standardSpacing) {
-                Text("为什么需要")
+                Text("用途")
                     .font(.headline)
                 ForEach(reasons, id: \.self) { reason in
                     Label(reason, systemImage: "checkmark.circle")
@@ -44,7 +44,7 @@ struct PermissionGuideAccessView: View {
                 Button("返回", systemImage: "chevron.left", action: backAction)
                 Spacer()
                 Button(
-                    isRequesting ? "等待系统确认" : "请求此权限",
+                    isRequesting ? "等待确认" : "请求权限",
                     systemImage: "lock.open",
                     action: requestAction
                 )

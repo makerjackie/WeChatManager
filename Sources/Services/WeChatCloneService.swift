@@ -95,8 +95,11 @@ actor WeChatCloneService {
         from installation: WeChatInstallation,
         replacing existingClone: WeChatClone?
     ) async throws -> WeChatClone {
-        guard index > 0, installation.isOfficiallySigned else {
-            throw AppError(message: "只能从腾讯官方签名的微信创建分身。")
+        guard index > 0 else {
+            throw AppError(message: "分身序号无效。")
+        }
+        guard isWeChatApplication(at: installation.applicationURL) else {
+            throw AppError(message: "当前应用不是可识别的微信。")
         }
 
         let applicationsDirectory = managedApplicationsDirectory
@@ -296,6 +299,23 @@ actor WeChatCloneService {
 
     private func defaultDisplayName(for index: Int) -> String {
         "微信分身 \(index)"
+    }
+
+    private func isWeChatApplication(at applicationURL: URL) -> Bool {
+        let plistURL = applicationURL.appending(path: "Contents/Info.plist")
+        guard let data = try? Data(contentsOf: plistURL),
+              let plist = try? PropertyListSerialization.propertyList(
+                from: data,
+                options: [],
+                format: nil
+              ) as? [String: Any],
+              plist["CFBundleIdentifier"] as? String == AppConstants.weChatBundleIdentifier,
+              let executableName = plist["CFBundleExecutable"] as? String,
+              !executableName.isEmpty else {
+            return false
+        }
+        let executableURL = applicationURL.appending(path: "Contents/MacOS/\(executableName)")
+        return fileManager.isExecutableFile(atPath: executableURL.path)
     }
 
     private func normalizedDisplayName(_ displayName: String, index: Int) -> String {

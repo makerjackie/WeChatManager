@@ -31,7 +31,7 @@ struct EnhancementOptionsCard: View {
                 ContentUnavailableView(
                     "当前没有可安装项",
                     systemImage: "shippingbox",
-                    description: Text("不兼容时不会修改微信；普通多开启动和文件管理不受影响。")
+                    description: Text("普通多开和文件管理不受影响。")
                 )
             }
         }

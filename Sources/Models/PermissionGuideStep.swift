@@ -29,13 +29,13 @@ enum PermissionGuideStep: Int, CaseIterable, Identifiable, Sendable {
     var summary: String {
         switch self {
         case .introduction:
-            "先了解用途，再交给 macOS 询问。"
+            "了解权限用途。"
         case .applicationAccess:
-            "读取官方微信的版本、构建号与签名，用于安全创建分身。"
+            "识别当前微信，用于创建分身。"
         case .fileAccess:
-            "定位账号文件目录与占用空间，不读取或上传聊天内容。"
+            "按账号整理本机文件。"
         case .appManagement:
-            "仅在创建、更新、移除分身或执行兼容增强时修改指定应用。"
+            "创建或更新分身时使用。"
         }
     }
 }
